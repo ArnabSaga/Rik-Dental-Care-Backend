@@ -1,0 +1,10 @@
+node_modules
+.env
+.env.*
+!.env.example
+dist
+
+/src/generated
+.vscode/settings.json
+resources/*
+
