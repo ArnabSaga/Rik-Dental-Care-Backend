@@ -7,12 +7,13 @@ dotenv.config();
 interface EnvVars {
   NODE_ENV: string;
   PORT: string;
+  DATABASE_URL: string;
 }
 
 const normalizeUrl = (url: string) => (url.endsWith("/") ? url.slice(0, -1) : url);
 
 const envVariables = (): EnvVars => {
-  const requiredEnvVars = ["NODE_ENV", "PORT"];
+  const requiredEnvVars = ["NODE_ENV", "PORT", "DATABASE_URL"];
 
   requiredEnvVars.forEach((variable) => {
     if (!process.env[variable]) {
@@ -26,6 +27,7 @@ const envVariables = (): EnvVars => {
   return {
     NODE_ENV: process.env.NODE_ENV as string,
     PORT: process.env.PORT as string,
+    DATABASE_URL: process.env.DATABASE_URL as string,
   };
 };
 

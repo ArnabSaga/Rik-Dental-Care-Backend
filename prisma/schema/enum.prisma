@@ -1,0 +1,53 @@
+enum Role {
+    ADMIN
+    PATIENT
+    MANAGER
+}
+
+enum Status {
+    ACTIVE
+    INACTIVE
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}
+
+enum BloodGroup {
+    APLUS
+    AMINUS
+    BPLUS
+    BMINUS
+    ABPLUS
+    ABMINUS
+    OPLUS
+    OMINUS
+}
+
+enum AppointmentType {
+    REGULAR
+    EMERGENCY
+}
+
+enum AppointmentStatus {
+    PENDING
+    CONFIRMED
+    CANCELLED
+    COMPLETED
+}
+
+enum PaymentStatus {
+    PENDING
+    PAID
+    UNPAID
+    PARTIALLY_PAID
+}
+
+enum PaymentMethod {
+    CASH
+    CARD
+    BANK_TRANSFER
+    MOBILE_BANKING
+}

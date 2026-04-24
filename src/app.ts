@@ -1,8 +1,9 @@
 import { toNodeHandler } from "better-auth/node";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import path from "path";
 import express, { Application, Request, Response } from "express";
+import path from "path";
+import { auth } from "./app/lib/auth";
 
 const app: Application = express();
 
@@ -31,11 +32,10 @@ app.use(
 app.use(cookieParser());
 
 //* application auth routes
-// app.use("/api/auth", toNodeHandler(auth));
+app.use("/api/auth", toNodeHandler(auth));
 
 //* application routes
 // app.use("/api/v1", router);
-
 
 //* Basic route
 app.get("/", (_req: Request, res: Response) => {
