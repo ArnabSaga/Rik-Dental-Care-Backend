@@ -1,0 +1,58 @@
+model PatientProfile {
+    id          String   @id @default(uuid())
+    userId      String   @unique
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    address     String?
+    emergencyContact String?
+    dateOfBirth DateTime?
+    gender      Gender?
+    bloodGroup  BloodGroup?
+    
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    deletedAt   DateTime?
+    isDeleted   Boolean  @default(false)
+
+    medicalHistory MedicalHistory[]
+
+    @@index([userId])
+    @@map("patient_profile")
+}
+
+model ManagerProfile {
+    id          String   @id @default(uuid())
+    userId      String   @unique
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    designation String?
+    phone       String?
+    
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    deletedAt   DateTime?
+    isDeleted   Boolean  @default(false)
+
+    @@index([userId])
+    @@map("manager_profile")
+}
+
+model DoctorProfile {
+    id          String   @id @default(uuid())
+    userId      String   @unique
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    bmdcNumber  String?
+    specialty   String?
+    designation String?
+    bio         String?
+    signatureUrl String?
+    
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    deletedAt   DateTime?
+    isDeleted   Boolean  @default(false)
+
+    @@index([userId])
+    @@map("doctor_profile")
+}

@@ -1,0 +1,88 @@
+model Invoice {
+    id              String        @id @default(uuid())
+    invoiceNo       String        @unique
+    appointmentId   String
+    appointment     Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+    
+    issuedById      String
+    issuedBy        User          @relation("IssuedBy", fields: [issuedById], references: [id])
+    
+    subtotalAmount  Decimal       @db.Decimal(10, 2)
+    discountAmount  Decimal       @default(0) @db.Decimal(10, 2)
+    taxAmount       Decimal       @default(0) @db.Decimal(10, 2)
+    totalAmount     Decimal       @db.Decimal(10, 2)
+    paidAmount      Decimal       @default(0) @db.Decimal(10, 2)
+    dueAmount       Decimal       @db.Decimal(10, 2)
+    
+    status          InvoiceStatus @default(DRAFT)
+    dueDate         DateTime?
+    pdfUrl          String?
+    
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+    deletedAt       DateTime?
+    isDeleted       Boolean       @default(false)
+
+    items           InvoiceItem[]
+    payments        Payment[]
+    attachments     Attachment[]
+
+    @@index([appointmentId])
+    @@index([issuedById])
+    @@index([status])
+    @@index([isDeleted])
+    @@map("invoice")
+}
+
+model InvoiceItem {
+    id              String        @id @default(uuid())
+    invoiceId       String
+    invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+    
+    serviceId       String?
+    service         DentalService? @relation(fields: [serviceId], references: [id])
+    
+    serviceName     String
+    description     String?
+    quantity        Int           @default(1)
+    unitPrice       Decimal       @db.Decimal(10, 2)
+    discountAmount  Decimal       @default(0) @db.Decimal(10, 2)
+    totalAmount     Decimal       @db.Decimal(10, 2)
+    
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+
+    @@index([invoiceId])
+    @@index([serviceId])
+    @@map("invoice_item")
+}
+
+model Payment {
+    id              String        @id @default(uuid())
+    invoiceId       String
+    invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+    
+    receivedById    String
+    receivedBy      User          @relation("ReceivedBy", fields: [receivedById], references: [id])
+    
+    amount          Decimal       @db.Decimal(10, 2)
+    method          PaymentMethod @default(CASH)
+    status          PaymentStatus @default(PENDING)
+    transactionId   String?       @unique
+    paidAt          DateTime      @default(now())
+    
+    notes           String?
+    
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+    deletedAt       DateTime?
+    isDeleted       Boolean       @default(false)
+
+    @@index([invoiceId])
+    @@index([receivedById])
+    @@index([paidAt])
+    @@index([status])
+    @@index([isDeleted])
+    @@index([transactionId])
+    @@map("payment")
+}

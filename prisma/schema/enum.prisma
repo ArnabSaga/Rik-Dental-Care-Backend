@@ -7,6 +7,7 @@ enum Role {
 enum Status {
     ACTIVE
     INACTIVE
+    BLOCKED
 }
 
 enum Gender {
@@ -26,6 +27,13 @@ enum BloodGroup {
     OMINUS
 }
 
+enum Priority {
+    LOW
+    NORMAL
+    HIGH
+    URGENT
+}
+
 enum AppointmentType {
     REGULAR
     EMERGENCY
@@ -34,20 +42,84 @@ enum AppointmentType {
 enum AppointmentStatus {
     PENDING
     CONFIRMED
-    CANCELLED
+    RESCHEDULED
+    IN_PROGRESS
     COMPLETED
+    CANCELLED
+    NO_SHOW
+}
+
+enum InvoiceStatus {
+    DRAFT
+    ISSUED
+    PARTIALLY_PAID
+    PAID
+    OVERDUE
+    CANCELLED
+    REFUNDED
 }
 
 enum PaymentStatus {
     PENDING
-    PAID
-    UNPAID
-    PARTIALLY_PAID
+    COMPLETED
+    FAILED
+    REFUNDED
+    CANCELLED
 }
 
 enum PaymentMethod {
     CASH
     CARD
     BANK_TRANSFER
-    MOBILE_BANKING
+    BKASH
+    NAGAD
+    ROCKET
+}
+
+enum NotificationType {
+    APPOINTMENT
+    EMERGENCY
+    REMINDER
+    PRESCRIPTION
+    INVOICE
+    SYSTEM
+}
+
+enum EntityType {
+    APPOINTMENT
+    INVOICE
+    PRESCRIPTION
+    MEDICAL_HISTORY
+    CLINICAL_NOTE
+    TREATMENT_PLAN
+    PAYMENT
+}
+
+enum ChatSenderType {
+    PATIENT
+    ADMIN
+    MANAGER
+    AI
+}
+
+enum ConversationType {
+    PATIENT_SUPPORT
+    AI_ASSISTANT
+    APPOINTMENT_RELATED
+}
+
+enum AttachmentType {
+    IMAGE
+    PDF
+    DOCUMENT
+    OTHER
+}
+
+enum MedicalHistoryType {
+    ALLERGY
+    SURGERY
+    DISEASE
+    MEDICATION
+    DENTAL_HISTORY
+    OTHER
 }

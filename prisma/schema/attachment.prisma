@@ -1,0 +1,35 @@
+model Attachment {
+    id              String         @id @default(uuid())
+    url             String
+    publicId        String?        // For Cloudinary
+    fileType        AttachmentType @default(IMAGE)
+    resourceType    String?        // e.g., "image", "video", "raw"
+    
+    // Poly-safe relations (Option A)
+    appointmentId   String?
+    appointment     Appointment?   @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+    
+    medicalHistoryId String?
+    medicalHistory  MedicalHistory? @relation(fields: [medicalHistoryId], references: [id], onDelete: SetNull)
+    
+    clinicalNoteId  String?
+    clinicalNote    ClinicalNote?  @relation(fields: [clinicalNoteId], references: [id], onDelete: SetNull)
+    
+    prescriptionId  String?
+    prescription    Prescription?  @relation(fields: [prescriptionId], references: [id], onDelete: SetNull)
+    
+    invoiceId       String?
+    invoice         Invoice?       @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+    
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt
+    deletedAt       DateTime?
+    isDeleted       Boolean        @default(false)
+
+    @@index([appointmentId])
+    @@index([medicalHistoryId])
+    @@index([clinicalNoteId])
+    @@index([prescriptionId])
+    @@index([invoiceId])
+    @@map("attachment")
+}

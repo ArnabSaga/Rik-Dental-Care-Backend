@@ -1,0 +1,20 @@
+model DentalService {
+    id          String   @id @default(uuid())
+    name        String
+    slug        String   @unique
+    description String?
+    basePrice   Decimal  @db.Decimal(10, 2)
+    isActive    Boolean  @default(true)
+    
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    deletedAt   DateTime?
+    isDeleted   Boolean  @default(false)
+
+    appointmentServices AppointmentService[]
+    invoiceItems        InvoiceItem[]
+
+    @@index([isActive])
+    @@index([isDeleted])
+    @@map("dental_service")
+}

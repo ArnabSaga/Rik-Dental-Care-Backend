@@ -1,0 +1,114 @@
+model MedicalHistory {
+    id          String   @id @default(uuid())
+    patientProfileId String
+    patientProfile PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Cascade)
+    
+    type        MedicalHistoryType @default(OTHER)
+    title       String?
+    condition   String?
+    allergy     String?
+    medication  String?
+    description String
+    date        DateTime
+    
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    deletedAt   DateTime?
+    isDeleted   Boolean  @default(false)
+
+    attachments Attachment[]
+
+    @@index([patientProfileId])
+    @@map("medical_history")
+}
+
+model ClinicalNote {
+    id              String      @id @default(uuid())
+    appointmentId   String
+    appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+    
+    notes           String
+    
+    createdById     String
+    createdBy       User        @relation("CreatedClinicalNotes", fields: [createdById], references: [id])
+
+    updatedById     String?
+    updatedBy       User?       @relation("UpdatedClinicalNotes", fields: [updatedById], references: [id])
+    
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+    deletedAt       DateTime?
+    isDeleted       Boolean     @default(false)
+
+    attachments Attachment[]
+
+    @@index([appointmentId])
+    @@map("clinical_note")
+}
+
+model TreatmentPlan {
+    id              String      @id @default(uuid())
+    appointmentId   String
+    appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+    
+    description     String
+    status          Status      @default(ACTIVE)
+    
+    createdById     String
+    createdBy       User        @relation("CreatedTreatmentPlans", fields: [createdById], references: [id])
+
+    updatedById     String?
+    updatedBy       User?       @relation("UpdatedTreatmentPlans", fields: [updatedById], references: [id])
+    
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+    deletedAt       DateTime?
+    isDeleted       Boolean     @default(false)
+
+    @@index([appointmentId])
+    @@map("treatment_plan")
+}
+
+model Prescription {
+    id              String      @id @default(uuid())
+    appointmentId   String
+    appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+    
+    notes           String?
+    pdfUrl          String?
+    
+    createdById     String
+    createdBy       User        @relation("CreatedPrescriptions", fields: [createdById], references: [id])
+
+    updatedById     String?
+    updatedBy       User?       @relation("UpdatedPrescriptions", fields: [updatedById], references: [id])
+    
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+    deletedAt       DateTime?
+    isDeleted       Boolean     @default(false)
+
+    items           PrescriptionItem[]
+    attachments     Attachment[]
+
+    @@index([appointmentId])
+    @@map("prescription")
+}
+
+model PrescriptionItem {
+    id              String       @id @default(uuid())
+    prescriptionId  String
+    prescription    Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+    
+    medicineName    String
+    dosage          String
+    frequency       String
+    duration        String
+    instructions    String?
+    
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
+
+    @@index([prescriptionId])
+    @@map("prescription_item")
+}
