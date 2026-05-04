@@ -1,17 +1,20 @@
 model User {
-    id            String   @id
+    id            String    @id
     name          String
     email         String
-    emailVerified Boolean  @default(false)
-    role          Role     @default(PATIENT)
-    status        Status   @default(ACTIVE)
+    emailVerified Boolean   @default(false)
+    role          Role      @default(PATIENT)
+    status        Status    @default(ACTIVE)
     image         String?
+    isActive      Boolean   @default(true)
+    isDeleted     Boolean   @default(false)
+    deletedAt     DateTime?
     phone         String?
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
 
-    sessions      Session[]
-    accounts      Account[]
+    sessions Session[]
+    accounts Account[]
 
     // Domain Profiles
     patientProfile PatientProfile?
@@ -20,9 +23,9 @@ model User {
 
     // Operational Relations
     notifications Notification[]
-    
-    sentMessages     ChatMessage[] @relation("MessageSender")
-    receivedMessages ChatMessage[] @relation("MessageRecipient")
+
+    sentMessages         ChatMessage[]  @relation("MessageSender")
+    receivedMessages     ChatMessage[]  @relation("MessageRecipient")
     patientConversations Conversation[] @relation("PatientConversations")
 
     // Appointment Relations
@@ -35,10 +38,10 @@ model User {
     issuedInvoices   Invoice[] @relation("IssuedBy")
 
     // Clinical Audit Relations
-    createdClinicalNotes ClinicalNote[] @relation("CreatedClinicalNotes")
-    updatedClinicalNotes ClinicalNote[] @relation("UpdatedClinicalNotes")
-    createdPrescriptions Prescription[] @relation("CreatedPrescriptions")
-    updatedPrescriptions Prescription[] @relation("UpdatedPrescriptions")
+    createdClinicalNotes  ClinicalNote[]  @relation("CreatedClinicalNotes")
+    updatedClinicalNotes  ClinicalNote[]  @relation("UpdatedClinicalNotes")
+    createdPrescriptions  Prescription[]  @relation("CreatedPrescriptions")
+    updatedPrescriptions  Prescription[]  @relation("UpdatedPrescriptions")
     createdTreatmentPlans TreatmentPlan[] @relation("CreatedTreatmentPlans")
     updatedTreatmentPlans TreatmentPlan[] @relation("UpdatedTreatmentPlans")
 

@@ -6,5 +6,6 @@ dist
 
 /src/generated
 .vscode/settings.json
-resources/*
+resource/*
+
 
