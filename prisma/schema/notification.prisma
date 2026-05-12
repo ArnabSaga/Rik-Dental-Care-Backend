@@ -1,24 +1,20 @@
 model Notification {
-    id              String           @id @default(uuid())
-    recipientId     String
-    recipient       User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-    
-    title           String
-    message         String
-    type            NotificationType @default(SYSTEM)
-    isRead          Boolean          @default(false)
-    readAt          DateTime?
-    
-    // Deep linking
-    entityType      EntityType?
-    entityId        String?
-    
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
-    deletedAt       DateTime?
-    isDeleted       Boolean          @default(false)
+  id          String           @id @default(uuid())
+  recipientId String
+  title       String
+  message     String
+  type        NotificationType @default(SYSTEM)
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  entityType  EntityType?
+  entityId    String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean          @default(false)
+  recipient   User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
-    @@index([recipientId, isRead])
-    @@index([entityType, entityId])
-    @@map("notification")
+  @@index([recipientId, isRead])
+  @@index([entityType, entityId])
+  @@map("notification")
 }

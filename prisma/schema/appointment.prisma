@@ -1,93 +1,79 @@
 model Appointment {
-    id              String            @id @default(uuid())
-    appointmentNo   String            @unique
-    patientId       String
-    patient         User              @relation("PatientAppointments", fields: [patientId], references: [id])
-    
-    treatedById     String?
-    treatedBy       User?             @relation("TreatedAppointments", fields: [treatedById], references: [id])
-    
-    createdById     String
-    createdBy       User              @relation("CreatedAppointments", fields: [createdById], references: [id])
-    
-    scheduledAt     DateTime
-    startedAt       DateTime?
-    completedAt     DateTime?
-    cancelledAt     DateTime?
-    
-    type            AppointmentType   @default(REGULAR)
-    status          AppointmentStatus @default(PENDING)
-    priority        Priority          @default(NORMAL)
-    
-    chiefComplaint  String?
-    symptoms        String?
-    emergencyNote   String?
-    cancelReason    String?
-    
-    rescheduledFromId String?
-    rescheduledFrom   Appointment?    @relation("RescheduledHistory", fields: [rescheduledFromId], references: [id])
-    rescheduledTo     Appointment[]   @relation("RescheduledHistory")
-    
-    createdAt       DateTime          @default(now())
-    updatedAt       DateTime          @updatedAt
-    deletedAt       DateTime?
-    isDeleted       Boolean           @default(false)
+  id                  String               @id @default(uuid())
+  patientId           String
+  treatedById         String?
+  createdById         String
+  scheduledAt         DateTime
+  startedAt           DateTime?
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  type                AppointmentType      @default(REGULAR)
+  status              AppointmentStatus    @default(PENDING)
+  priority            Priority             @default(NORMAL)
+  chiefComplaint      String?
+  symptoms            String?
+  emergencyNote       String?
+  cancelReason        String?
+  rescheduledFromId   String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  deletedAt           DateTime?
+  isDeleted           Boolean              @default(false)
+  appointmentNo       String               @unique
+  createdBy           User                 @relation("CreatedAppointments", fields: [createdById], references: [id])
+  patient             User                 @relation("PatientAppointments", fields: [patientId], references: [id])
+  rescheduledFrom     Appointment?         @relation("RescheduledHistory", fields: [rescheduledFromId], references: [id])
+  rescheduledTo       Appointment[]        @relation("RescheduledHistory")
+  treatedBy           User?                @relation("TreatedAppointments", fields: [treatedById], references: [id])
+  appointmentServices AppointmentService[]
+  attachments         Attachment[]
+  clinicalNotes       ClinicalNote[]
+  invoices            Invoice[]
+  prescriptions       Prescription[]
+  treatmentPlans      TreatmentPlan[]
 
-    // Relations
-    appointmentServices AppointmentService[]
-    invoices            Invoice[]
-    prescriptions       Prescription[]
-    clinicalNotes       ClinicalNote[]
-    treatmentPlans      TreatmentPlan[]
-    attachments         Attachment[]
-
-    @@index([patientId])
-    @@index([treatedById])
-    @@index([createdById])
-    @@index([scheduledAt])
-    @@index([status])
-    @@index([isDeleted])
-    @@index([treatedById, scheduledAt])
-    @@index([patientId, scheduledAt])
-    @@map("appointment")
+  @@index([patientId])
+  @@index([treatedById])
+  @@index([createdById])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([isDeleted])
+  @@index([treatedById, scheduledAt])
+  @@index([patientId, scheduledAt])
+  @@map("appointment")
 }
 
 model AppointmentService {
-    id            String        @id @default(uuid())
-    appointmentId String
-    appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-    
-    serviceId     String
-    service       DentalService @relation(fields: [serviceId], references: [id])
-    
-    quantity      Int           @default(1)
-    unitPrice     Decimal?      @db.Decimal(10, 2)
-    notes         String?
-    
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
+  id            String        @id @default(uuid())
+  appointmentId String
+  serviceId     String
+  quantity      Int           @default(1)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  unitPrice     Decimal?      @db.Decimal(10, 2)
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  service       DentalService @relation(fields: [serviceId], references: [id])
 
-    @@index([appointmentId])
-    @@index([serviceId])
-    @@map("appointment_service")
+  @@index([appointmentId])
+  @@index([serviceId])
+  @@map("appointment_service")
 }
 
 model DoctorAvailability {
-    id              String   @id @default(uuid())
-    userId          String
-    user            User     @relation("DoctorAvailabilities", fields: [userId], references: [id], onDelete: Cascade)
+  id              String   @id @default(uuid())
+  userId          String
+  dayOfWeek       Int
+  startTime       String
+  endTime         String
+  maxAppointments Int      @default(10)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation("DoctorAvailabilities", fields: [userId], references: [id], onDelete: Cascade)
 
-    dayOfWeek       Int
-    startTime       String
-    endTime         String
-    maxAppointments Int      @default(10)
-    isActive        Boolean  @default(true)
-
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
-
-    @@index([userId])
-    @@index([dayOfWeek])
-    @@unique([userId, dayOfWeek, startTime, endTime])
-    @@map("doctor_availability")
+  @@unique([userId, dayOfWeek, startTime, endTime])
+  @@index([userId])
+  @@index([dayOfWeek])
+  @@map("doctor_availability")
 }

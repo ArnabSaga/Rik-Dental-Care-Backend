@@ -3,7 +3,7 @@ import status from "http-status";
 import nodemailer from "nodemailer";
 import path from "path";
 import { envVars } from "../config/env";
-import AppError from "../errors/AppError";
+import AppError from "../shared/errors/AppError";
 
 export interface EmailAttachment {
   filename: string;

@@ -4,7 +4,7 @@ import { emailOTP, oAuthProxy } from "better-auth/plugins";
 
 import { Role, Status } from "../../generated/prisma/enums";
 import { envVars } from "../config/env";
-import { sendEmail } from "../utils/email";
+import { sendEmail } from "../utils/emailTemplate";
 
 import { prisma } from "./prisma";
 
@@ -49,7 +49,8 @@ export const auth = betterAuth({
       clientId: envVars.GOOGLE_CLIENT_ID,
       clientSecret: envVars.GOOGLE_CLIENT_SECRET,
       mapProfileToUser: () => ({
-        systemRole: Role.PATIENT,
+        role: Role.PATIENT,
+        status: Status.ACTIVE,
         isActive: true,
         emailVerified: true,
         isDeleted: false,

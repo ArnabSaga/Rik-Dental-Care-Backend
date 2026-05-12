@@ -1,103 +1,87 @@
 model User {
-    id            String    @id
-    name          String
-    email         String
-    emailVerified Boolean   @default(false)
-    role          Role      @default(PATIENT)
-    status        Status    @default(ACTIVE)
-    image         String?
-    isActive      Boolean   @default(true)
-    isDeleted     Boolean   @default(false)
-    deletedAt     DateTime?
-    phone         String?
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+  id                    String               @id
+  name                  String
+  email                 String               @unique
+  emailVerified         Boolean              @default(false)
+  role                  Role                 @default(PATIENT)
+  status                Status               @default(ACTIVE)
+  image                 String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  phone                 String?
+  isActive              Boolean              @default(true)
+  isDeleted             Boolean              @default(false)
+  deletedAt             DateTime?
+  accounts              Account[]
+  createdAppointments   Appointment[]        @relation("CreatedAppointments")
+  appointmentsAsPatient Appointment[]        @relation("PatientAppointments")
+  appointmentsAsDoctor  Appointment[]        @relation("TreatedAppointments")
+  receivedMessages      ChatMessage[]        @relation("MessageRecipient")
+  sentMessages          ChatMessage[]        @relation("MessageSender")
+  createdClinicalNotes  ClinicalNote[]       @relation("CreatedClinicalNotes")
+  updatedClinicalNotes  ClinicalNote[]       @relation("UpdatedClinicalNotes")
+  patientConversations  Conversation[]       @relation("PatientConversations")
+  doctorAvailabilities  DoctorAvailability[] @relation("DoctorAvailabilities")
+  doctorProfile         DoctorProfile?
+  issuedInvoices        Invoice[]            @relation("IssuedBy")
+  managerProfile        ManagerProfile?
+  notifications         Notification[]
+  patientProfile        PatientProfile?
+  receivedPayments      Payment[]            @relation("ReceivedBy")
+  createdPrescriptions  Prescription[]       @relation("CreatedPrescriptions")
+  updatedPrescriptions  Prescription[]       @relation("UpdatedPrescriptions")
+  sessions              Session[]
+  createdTreatmentPlans TreatmentPlan[]      @relation("CreatedTreatmentPlans")
+  updatedTreatmentPlans TreatmentPlan[]      @relation("UpdatedTreatmentPlans")
 
-    sessions Session[]
-    accounts Account[]
-
-    // Domain Profiles
-    patientProfile PatientProfile?
-    managerProfile ManagerProfile?
-    doctorProfile  DoctorProfile?
-
-    // Operational Relations
-    notifications Notification[]
-
-    sentMessages         ChatMessage[]  @relation("MessageSender")
-    receivedMessages     ChatMessage[]  @relation("MessageRecipient")
-    patientConversations Conversation[] @relation("PatientConversations")
-
-    // Appointment Relations
-    appointmentsAsPatient Appointment[] @relation("PatientAppointments")
-    appointmentsAsDoctor  Appointment[] @relation("TreatedAppointments")
-    createdAppointments   Appointment[] @relation("CreatedAppointments")
-
-    // Financial Relations
-    receivedPayments Payment[] @relation("ReceivedBy")
-    issuedInvoices   Invoice[] @relation("IssuedBy")
-
-    // Clinical Audit Relations
-    createdClinicalNotes  ClinicalNote[]  @relation("CreatedClinicalNotes")
-    updatedClinicalNotes  ClinicalNote[]  @relation("UpdatedClinicalNotes")
-    createdPrescriptions  Prescription[]  @relation("CreatedPrescriptions")
-    updatedPrescriptions  Prescription[]  @relation("UpdatedPrescriptions")
-    createdTreatmentPlans TreatmentPlan[] @relation("CreatedTreatmentPlans")
-    updatedTreatmentPlans TreatmentPlan[] @relation("UpdatedTreatmentPlans")
-
-    // Doctor Availability
-    doctorAvailabilities DoctorAvailability[] @relation("DoctorAvailabilities")
-
-    @@unique([email])
-    @@index([role])
-    @@index([status])
-    @@map("user")
+  @@index([role])
+  @@index([status])
+  @@map("user")
 }
 
 model Session {
-    id        String   @id
-    expiresAt DateTime
-    token     String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    ipAddress String?
-    userAgent String?
-    userId    String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([token])
-    @@index([userId])
-    @@map("session")
+  @@index([userId])
+  @@map("session")
 }
 
 model Account {
-    id                    String    @id
-    accountId             String
-    providerId            String
-    userId                String
-    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    accessToken           String?
-    refreshToken          String?
-    idToken               String?
-    accessTokenExpiresAt  DateTime?
-    refreshTokenExpiresAt DateTime?
-    scope                 String?
-    password              String?
-    createdAt             DateTime  @default(now())
-    updatedAt             DateTime  @updatedAt
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@map("account")
+  @@index([userId])
+  @@map("account")
 }
 
 model Verification {
-    id         String   @id
-    identifier String
-    value      String
-    expiresAt  DateTime
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-    @@index([identifier])
-    @@map("verification")
+  @@index([identifier])
+  @@map("verification")
 }

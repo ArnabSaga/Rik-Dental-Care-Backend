@@ -1,45 +1,38 @@
 model Conversation {
-    id              String           @id @default(uuid())
-    title           String?
-    type            ConversationType @default(PATIENT_SUPPORT)
-    
-    patientId       String?
-    patient         User?            @relation("PatientConversations", fields: [patientId], references: [id])
+  id        String           @id @default(uuid())
+  title     String?
+  type      ConversationType @default(PATIENT_SUPPORT)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean          @default(false)
+  patientId String?
+  messages  ChatMessage[]
+  patient   User?            @relation("PatientConversations", fields: [patientId], references: [id])
 
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
-    deletedAt       DateTime?
-    isDeleted       Boolean          @default(false)
-
-    messages        ChatMessage[]
-
-    @@index([patientId])
-    @@map("conversation")
+  @@index([patientId])
+  @@map("conversation")
 }
 
 model ChatMessage {
-    id              String         @id @default(uuid())
-    conversationId  String
-    conversation    Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-    
-    senderId        String?
-    sender          User?          @relation("MessageSender", fields: [senderId], references: [id])
-    
-    recipientId     String?
-    recipient       User?          @relation("MessageRecipient", fields: [recipientId], references: [id])
-    
-    content         String
-    senderType      ChatSenderType @default(PATIENT)
-    sentAt          DateTime       @default(now())
-    readAt          DateTime?
-    
-    createdAt       DateTime       @default(now())
-    updatedAt       DateTime       @updatedAt
-    deletedAt       DateTime?
-    isDeleted       Boolean        @default(false)
+  id             String         @id @default(uuid())
+  conversationId String
+  senderId       String?
+  recipientId    String?
+  content        String
+  senderType     ChatSenderType @default(PATIENT)
+  sentAt         DateTime       @default(now())
+  readAt         DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean        @default(false)
+  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  recipient      User?          @relation("MessageRecipient", fields: [recipientId], references: [id])
+  sender         User?          @relation("MessageSender", fields: [senderId], references: [id])
 
-    @@index([conversationId])
-    @@index([senderId])
-    @@index([recipientId])
-    @@map("chat_message")
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([recipientId])
+  @@map("chat_message")
 }
