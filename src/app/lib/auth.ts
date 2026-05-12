@@ -2,11 +2,30 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP, oAuthProxy } from "better-auth/plugins";
 
-import { Role, Status } from "../../generated/prisma/enums";
 import { envVars } from "../config/env";
 import { sendEmail } from "../utils/emailTemplate";
-
 import { prisma } from "./prisma";
+
+const USER_ROLE = {
+  ADMIN: "ADMIN",
+  PATIENT: "PATIENT",
+  MANAGER: "MANAGER",
+} as const;
+
+const USER_STATUS = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  BLOCKED: "BLOCKED",
+} as const;
+
+const normalizeUrl = (url: string) => url.replace(/\/$/, "");
+
+const trustedOrigins = [
+  envVars.FRONTEND_URL,
+  ...(envVars.NODE_ENV === "development" ? ["http://localhost:3000", "http://127.0.0.1:3000"] : []),
+]
+  .filter(Boolean)
+  .map((origin) => normalizeUrl(origin));
 
 const sendOtpEmail = async (options: {
   email: string;
@@ -33,11 +52,9 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
 
-  baseURL: envVars.BETTER_AUTH_URL,
-  trustedOrigins: [
-    envVars.FRONTEND_URL,
-    ...(envVars.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
-  ].filter(Boolean),
+  secret: envVars.BETTER_AUTH_SECRET,
+  baseURL: normalizeUrl(envVars.BETTER_AUTH_URL),
+  trustedOrigins,
 
   emailAndPassword: {
     enabled: true,
@@ -48,9 +65,10 @@ export const auth = betterAuth({
     google: {
       clientId: envVars.GOOGLE_CLIENT_ID,
       clientSecret: envVars.GOOGLE_CLIENT_SECRET,
+
       mapProfileToUser: () => ({
-        role: Role.PATIENT,
-        status: Status.ACTIVE,
+        role: USER_ROLE.PATIENT,
+        status: USER_STATUS.ACTIVE,
         isActive: true,
         emailVerified: true,
         isDeleted: false,
@@ -64,28 +82,33 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: true,
-        defaultValue: Role.PATIENT,
+        defaultValue: USER_ROLE.PATIENT,
       },
+
       status: {
         type: "string",
         required: true,
-        defaultValue: Status.ACTIVE,
+        defaultValue: USER_STATUS.ACTIVE,
       },
+
       phone: {
         type: "string",
         required: false,
         defaultValue: null,
       },
+
       isActive: {
         type: "boolean",
         required: true,
         defaultValue: true,
       },
+
       isDeleted: {
         type: "boolean",
         required: true,
         defaultValue: false,
       },
+
       deletedAt: {
         type: "date",
         required: false,
@@ -96,6 +119,7 @@ export const auth = betterAuth({
 
   plugins: [
     oAuthProxy(),
+
     emailOTP({
       overrideDefaultEmailVerification: true,
       otpLength: 6,
@@ -123,12 +147,12 @@ export const auth = betterAuth({
           });
 
           if (user?.isDeleted) {
-            console.warn(`[AUTH][OTP] Skipped deleted user: ${normalizedEmail}`);
+            console.warn(`[AUTH][OTP] skipped deleted user: ${normalizedEmail}`);
             return;
           }
 
           if (user && !user.isActive) {
-            console.warn(`[AUTH][OTP] Skipped inactive user: ${normalizedEmail}`);
+            console.warn(`[AUTH][OTP] skipped inactive user: ${normalizedEmail}`);
             return;
           }
 
@@ -152,11 +176,11 @@ export const auth = betterAuth({
               subject: "Password Reset OTP",
             });
 
-            console.log(`[AUTH][OTP] reset OTP email sent to ${normalizedEmail}`);
+            console.log(`[AUTH][OTP] password reset OTP email sent to ${normalizedEmail}`);
             return;
           }
 
-          console.warn(`[AUTH][OTP] Unsupported type: ${type}`);
+          console.warn(`[AUTH][OTP] unsupported OTP type: ${type}`);
         } catch (error) {
           console.error("[AUTH][OTP] sendVerificationOTP failed:", error);
           throw error;
@@ -166,7 +190,7 @@ export const auth = betterAuth({
   ],
 
   redirectURLs: {
-    signIn: `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success`,
+    signIn: `${normalizeUrl(envVars.BETTER_AUTH_URL)}/api/v1/auth/google/success`,
   },
 
   advanced: {
@@ -178,6 +202,7 @@ export const auth = betterAuth({
           httpOnly: true,
           secure: envVars.NODE_ENV === "production",
           sameSite: "lax",
+          path: "/",
         },
       },
     },
