@@ -1,7 +1,7 @@
-import { Status } from "../../../generated/prisma/enums";
-
 export const USER_STATUS = {
-  ACTIVE: Status.ACTIVE,
-  INACTIVE: Status.INACTIVE,
-  BLOCKED: Status.BLOCKED,
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  BLOCKED: "BLOCKED",
 } as const;
+
+export type TUserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];

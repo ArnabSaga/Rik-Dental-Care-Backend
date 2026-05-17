@@ -1,6 +1,6 @@
 import { Router } from "express";
+import { roleMiddleware } from "../../middleware/validateRole";
 import { validateRequest } from "../../middleware/validateRequest";
-import { validateRole } from "../../middleware/validateRole";
 import { UserController } from "./user.controller";
 import { requireAuth, USER_ROLE } from "./user.utils";
 import { UserValidation } from "./user.validation";
@@ -9,7 +9,7 @@ const router = Router();
 
 router.use(requireAuth);
 
-// Current user routes
+// Current logged-in user routes
 router.get("/me", UserController.getMe);
 
 router.put("/me", validateRequest({ body: UserValidation.updateMe }), UserController.updateMe);
@@ -19,21 +19,21 @@ router.patch("/me", validateRequest({ body: UserValidation.updateMe }), UserCont
 // Admin routes
 router.get(
   "/",
-  validateRole(USER_ROLE.ADMIN),
+  roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({ query: UserValidation.getAllUsersQuery }),
   UserController.getAllUsers
 );
 
 router.get(
   "/:id",
-  validateRole(USER_ROLE.ADMIN),
+  roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({ params: UserValidation.idParam }),
   UserController.getUserById
 );
 
 router.put(
   "/:id",
-  validateRole(USER_ROLE.ADMIN),
+  roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({
     params: UserValidation.idParam,
     body: UserValidation.updateByAdmin,
@@ -43,7 +43,7 @@ router.put(
 
 router.patch(
   "/:id",
-  validateRole(USER_ROLE.ADMIN),
+  roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({
     params: UserValidation.idParam,
     body: UserValidation.updateByAdmin,
@@ -53,7 +53,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  validateRole(USER_ROLE.ADMIN),
+  roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({ params: UserValidation.idParam }),
   UserController.deleteUserByAdmin
 );

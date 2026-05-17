@@ -114,13 +114,9 @@ const getUserById = async (id: string) => {
   return user;
 };
 
-const updateUserByAdmin = async (
-  id: string,
-  payload: IAdminUpdateUserPayload,
-  adminUserId: string
-) => {
-  await ensureUserExists(id);
-
+const normalizeAdminUpdatePayload = (
+  payload: IAdminUpdateUserPayload
+): Partial<IAdminUpdateUserPayload> => {
   const cleanPayload = removeUndefinedFields({
     name: payload.name,
     phone: payload.phone,
@@ -130,6 +126,34 @@ const updateUserByAdmin = async (
     isActive: payload.isActive,
     emailVerified: payload.emailVerified,
   });
+
+  if (cleanPayload.status === USER_STATUS.ACTIVE) {
+    cleanPayload.isActive = true;
+  }
+
+  if (cleanPayload.status === USER_STATUS.INACTIVE || cleanPayload.status === USER_STATUS.BLOCKED) {
+    cleanPayload.isActive = false;
+  }
+
+  if (cleanPayload.isActive === true && !cleanPayload.status) {
+    cleanPayload.status = USER_STATUS.ACTIVE;
+  }
+
+  if (cleanPayload.isActive === false && !cleanPayload.status) {
+    cleanPayload.status = USER_STATUS.INACTIVE;
+  }
+
+  return cleanPayload;
+};
+
+const updateUserByAdmin = async (
+  id: string,
+  payload: IAdminUpdateUserPayload,
+  adminUserId: string
+) => {
+  await ensureUserExists(id);
+
+  const cleanPayload = normalizeAdminUpdatePayload(payload);
 
   if (Object.keys(cleanPayload).length === 0) {
     throw new AppError(status.BAD_REQUEST, "No valid update data provided");
