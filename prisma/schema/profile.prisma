@@ -6,6 +6,8 @@ model PatientProfile {
   dateOfBirth      DateTime?
   gender           Gender?
   bloodGroup       BloodGroup?
+  allergy          String?
+  medicalCondition String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   deletedAt        DateTime?
@@ -14,6 +16,9 @@ model PatientProfile {
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([gender])
+  @@index([bloodGroup])
+  @@index([isDeleted])
   @@map("patient_profile")
 }
 
@@ -29,6 +34,7 @@ model ManagerProfile {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([isDeleted])
   @@map("manager_profile")
 }
 
@@ -47,5 +53,6 @@ model DoctorProfile {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([isDeleted])
   @@map("doctor_profile")
 }
