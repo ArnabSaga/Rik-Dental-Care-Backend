@@ -3,6 +3,7 @@ import { AuthRoutes } from "../module/auth/auth.route";
 import { DentalServiceRoutes } from "../module/dentalService/dentalService.route";
 import { ProfileRoutes } from "../module/profile/profile.route";
 import { UserRoutes } from "../module/user/user.route";
+import { AppointmentRoutes } from '../module/appointment/appointment.route';
 
 const router = Router();
 
@@ -22,6 +23,10 @@ const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: "/dental-services",
     route: DentalServiceRoutes,
+  },
+  {
+    path: "/appointments",
+    route: AppointmentRoutes,
   },
 ];
 
