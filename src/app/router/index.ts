@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { AuthRoutes } from "../module/auth/auth.route";
+import { DentalServiceRoutes } from "../module/dentalService/dentalService.route";
 import { ProfileRoutes } from "../module/profile/profile.route";
 import { UserRoutes } from "../module/user/user.route";
 
@@ -17,6 +18,10 @@ const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: "/profiles",
     route: ProfileRoutes,
+  },
+  {
+    path: "/dental-services",
+    route: DentalServiceRoutes,
   },
 ];
 
