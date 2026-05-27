@@ -1,10 +1,11 @@
 import { Router } from "express";
+import { AppointmentRoutes } from '../module/appointment/appointment.route';
 import { AuthRoutes } from "../module/auth/auth.route";
 import { DentalServiceRoutes } from "../module/dentalService/dentalService.route";
+import { MedicalHistoryRoutes } from '../module/medicalHistory/medicalHistory.route';
+import { PrescriptionRoutes } from '../module/prescription/prescription.route';
 import { ProfileRoutes } from "../module/profile/profile.route";
 import { UserRoutes } from "../module/user/user.route";
-import { AppointmentRoutes } from '../module/appointment/appointment.route';
-import { MedicalHistoryRoutes } from '../module/medicalHistory/medicalHistory.route';
 
 const router = Router();
 
@@ -32,7 +33,11 @@ const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: "/medical-histories",
     route: MedicalHistoryRoutes,
-  }
+  },
+  {
+    path: "/prescriptions",
+    route: PrescriptionRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
