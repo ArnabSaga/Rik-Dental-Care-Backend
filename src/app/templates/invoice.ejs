@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice - <%= invoice.invoiceNo %>
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            /* Modern Blue */
+            --primary-dark: #1e40af;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            /* Slate 900 */
+            --text-muted: #64748b;
+            /* Slate 500 */
+            --border-color: #e2e8f0;
+            /* Slate 200 */
+            --bg-body: #f1f5f9;
+            /* Slate 100 */
+            --bg-card: #f8fafc;
+            /* Slate 50 */
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 40px 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            background: var(--bg-body);
+            font-size: 14px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .invoice-wrapper {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+            border-top: 8px solid var(--primary);
+        }
+
+        /* --- Header --- */
+        .header {
+            padding: 48px 48px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+        }
+
+        .clinic-info {
+            max-width: 60%;
+        }
+
+        .clinic-name {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .clinic-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h2 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--border-color);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .invoice-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .invoice-meta strong {
+            color: var(--text-main);
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary);
+            margin-top: 8px;
+        }
+
+        /* --- Content & Grid --- */
+        .content {
+            padding: 0 48px 48px;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .info-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .info-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-line strong {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .info-line span {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* --- Table --- */
+        .table-container {
+            margin-bottom: 32px;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .service-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* --- Summary --- */
+        .summary {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .summary-box {
+            width: 380px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .summary-row:first-child {
+            padding-top: 0;
+        }
+
+        .summary-row strong {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .summary-row.total {
+            margin-top: 12px;
+            padding-top: 16px;
+            padding-bottom: 0;
+            border-bottom: none;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .summary-row.total .total-amount {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .summary-row.due {
+            border-bottom: none;
+            padding-bottom: 0;
+            padding-top: 16px;
+        }
+
+        .summary-row.due strong {
+            color: #ef4444;
+            /* Red for due amount */
+        }
+
+        /* --- Note & Footer --- */
+        .note-box {
+            margin-top: 40px;
+            padding: 20px;
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            color: var(--primary-dark);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .note-box strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .footer {
+            padding: 24px 48px;
+            background: var(--white);
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        /* --- Print Styles --- */
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .invoice-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                border-top: 6px solid var(--primary);
+                max-width: 100%;
+            }
+
+            .content,
+            .header {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .footer {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-wrapper">
+        <div class="header">
+            <div class="clinic-info">
+                <h1 class="clinic-name">Rik Dental Care Center</h1>
+                <p class="clinic-subtitle">Modern Dental Care & Patient Service</p>
+                <p class="clinic-subtitle">Dhaka, Bangladesh</p>
+                <p class="clinic-subtitle">support@rikdentalcare.com</p>
+            </div>
+
+            <div class="invoice-title">
+                <h2>Invoice</h2>
+                <div class="invoice-meta">
+                    <div><strong>No:</strong>
+                        <%= invoice.invoiceNo %>
+                    </div>
+                    <div><strong>Date:</strong>
+                        <%= new Date(invoice.createdAt).toLocaleDateString() %>
+                    </div>
+                </div>
+                <span class="status-badge">
+                    <%= invoice.status %>
+                </span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section-grid">
+                <div class="card">
+                    <h3 class="card-title">Patient Information</h3>
+
+                    <div class="info-line">
+                        <strong>Name</strong>
+                        <span>
+                            <%= invoice.appointment?.patient?.name || "N/A" %>
+                        </span>
+                    </div>
+
+                    <div class="info-line">
+                        <strong>Email</strong>
+                        <span>
+                            <%= invoice.appointment?.patient?.email || "N/A" %>
+                        </span>
+                    </div>
+
+                    <div class="info-line">
+                        <strong>Phone</strong>
+                        <span>
+                            <%= invoice.appointment?.patient?.phone || "N/A" %>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Appointment Details</h3>
+
+                    <div class="info-line">
+                        <strong>Appt. No</strong>
+                        <span>
+                            <%= invoice.appointment?.appointmentNo || "N/A" %>
+                        </span>
+                    </div>
+
+                    <div class="info-line">
+                        <strong>Date</strong>
+                        <span>
+                            <%= invoice.appointment?.scheduledAt ? new
+                                Date(invoice.appointment.scheduledAt).toLocaleString() : "N/A" %>
+                        </span>
+                    </div>
+
+                    <div class="info-line">
+                        <strong>Doctor</strong>
+                        <span>
+                            <%= invoice.appointment?.treatedBy?.name || "N/A" %>
+                        </span>
+                    </div>
+
+                    <div class="info-line">
+                        <strong>Due Date</strong>
+                        <span>
+                            <%= invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "N/A" %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3 class="table-title">Invoice Items</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">SL</th>
+                            <th width="40%">Service & Description</th>
+                            <th class="text-center" width="10%">Qty</th>
+                            <th class="text-right" width="15%">Unit Price</th>
+                            <th class="text-right" width="15%">Discount</th>
+                            <th class="text-right" width="15%">Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% if (invoice.items && invoice.items.length> 0) { %>
+                            <% invoice.items.forEach(function(item, index) { %>
+                                <tr>
+                                    <td>
+                                        <%= index + 1 %>
+                                    </td>
+                                    <td>
+                                        <span class="service-name">
+                                            <%= item.serviceName || item.service?.name || "Service" %>
+                                        </span>
+                                        <span class="service-desc">
+                                            <%= item.description || "-" %>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <%= item.quantity %>
+                                    </td>
+                                    <td class="text-right">
+                                        <%= item.unitPrice %>
+                                    </td>
+                                    <td class="text-right">
+                                        <%= item.discountAmount %>
+                                    </td>
+                                    <td class="text-right" style="font-weight: 600;">
+                                        <%= item.totalAmount %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6" class="text-center"
+                                                style="padding: 40px; color: var(--text-muted);">
+                                                No invoice items found
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary">
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <strong>
+                            <%= invoice.subtotalAmount %>
+                        </strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Discount</span>
+                        <strong>
+                            <%= invoice.discountAmount %>
+                        </strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Tax</span>
+                        <strong>
+                            <%= invoice.taxAmount %>
+                        </strong>
+                    </div>
+
+                    <div class="summary-row total">
+                        <span>Total Amount</span>
+                        <span class="total-amount">
+                            <%= invoice.totalAmount %>
+                        </span>
+                    </div>
+
+                    <div class="summary-row" style="margin-top: 16px; border-bottom: none; padding-bottom: 0;">
+                        <span>Amount Paid</span>
+                        <strong>
+                            <%= invoice.paidAmount %>
+                        </strong>
+                    </div>
+
+                    <div class="summary-row due">
+                        <span>Balance Due</span>
+                        <strong>
+                            <%= invoice.dueAmount %>
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note-box">
+                <strong>Important Note</strong>
+                This invoice is generated electronically by Rik Dental Care Center. Please contact the clinic for any
+                correction or payment-related queries. Issued by: <%= invoice.issuedBy?.name || "System" %>.
+            </div>
+        </div>
+
+        <div class="footer">
+            Thank you for choosing Rik Dental Care Center. Wishing you a healthy smile!
+        </div>
+    </div>
+</body>
+
+</html>

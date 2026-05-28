@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { AppointmentRoutes } from '../module/appointment/appointment.route';
+import { AppointmentRoutes } from "../module/appointment/appointment.route";
 import { AuthRoutes } from "../module/auth/auth.route";
 import { DentalServiceRoutes } from "../module/dentalService/dentalService.route";
-import { MedicalHistoryRoutes } from '../module/medicalHistory/medicalHistory.route';
-import { PrescriptionRoutes } from '../module/prescription/prescription.route';
+import { InvoiceRoutes } from "../module/invoice/invoice.route";
+import { MedicalHistoryRoutes } from "../module/medicalHistory/medicalHistory.route";
+import { PrescriptionRoutes } from "../module/prescription/prescription.route";
 import { ProfileRoutes } from "../module/profile/profile.route";
 import { UserRoutes } from "../module/user/user.route";
 
@@ -37,6 +38,10 @@ const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: "/prescriptions",
     route: PrescriptionRoutes,
+  },
+  {
+    path: "/invoices",
+    route: InvoiceRoutes,
   },
 ];
 
