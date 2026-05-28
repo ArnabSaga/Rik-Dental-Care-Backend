@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import status from "http-status";
 import { catchAsync } from "../../shared/helpers/catchAsync";
 import { sendResponse } from "../../shared/response/sendResponse";
-import { generatePDF } from "../../utils/pdfGenerator";
 import { IInvoiceQuery } from "./invoice.interface";
 import { InvoiceService } from "./invoice.service";
 import { getParamId } from "./invoice.utils";
@@ -69,12 +68,29 @@ const deleteInvoice = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const renderInvoice = catchAsync(async (req: Request, res: Response) => {
+  const invoiceId = getParamId(req.params.id);
+
+  const invoice = await InvoiceService.getInvoiceForTemplate(invoiceId, req.user!);
+
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+
+  res.render("invoice", {
+    invoice,
+  });
+});
+
 const downloadInvoice = catchAsync(async (req: Request, res: Response) => {
   const invoiceId = getParamId(req.params.id);
 
-  const result = await InvoiceService.getInvoicePdfContent(invoiceId, req.user!);
+  const invoice = await InvoiceService.getInvoiceForTemplate(invoiceId, req.user!);
 
-  generatePDF(result.title, result.content, res);
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${invoice.invoiceNo}.html"`);
+
+  res.render("invoice", {
+    invoice,
+  });
 });
 
 export const InvoiceController = {
@@ -83,5 +99,6 @@ export const InvoiceController = {
   getInvoiceById,
   updateInvoice,
   deleteInvoice,
+  renderInvoice,
   downloadInvoice,
 };

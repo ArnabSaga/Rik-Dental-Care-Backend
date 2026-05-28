@@ -26,6 +26,12 @@ router.post(
 );
 
 router.get(
+  "/preview/:id",
+  validateRequest({ params: InvoiceValidation.idParam }),
+  InvoiceController.renderInvoice
+);
+
+router.get(
   "/download/:id",
   validateRequest({ params: InvoiceValidation.idParam }),
   InvoiceController.downloadInvoice

@@ -286,6 +286,7 @@ const createInvoice = async (
   });
 
   const dueDate = normalizeDate(payload.dueDate);
+
   const statusValue = resolveInvoiceStatus({
     requestedStatus: payload.status,
     paidAmount: totals.paidAmount,
@@ -330,6 +331,12 @@ const createInvoice = async (
 
 const getInvoiceById = async (invoiceId: string, authUser: User) => {
   return await ensureInvoiceAccess(invoiceId, authUser);
+};
+
+const getInvoiceForTemplate = async (invoiceId: string, authUser: User) => {
+  const invoice = await ensureInvoiceAccess(invoiceId, authUser);
+
+  return invoice;
 };
 
 const updateInvoice = async (
@@ -501,51 +508,11 @@ const deleteInvoice = async (invoiceId: string, authUser: User) => {
   return deletedInvoice;
 };
 
-const getInvoicePdfContent = async (invoiceId: string, authUser: User) => {
-  const invoice = await ensureInvoiceAccess(invoiceId, authUser);
-
-  const itemLines = invoice.items
-    .map((item, index) => {
-      return `${index + 1}. ${item.serviceName} | Qty: ${
-        item.quantity
-      } | Unit: ${item.unitPrice} | Discount: ${item.discountAmount} | Total: ${item.totalAmount}`;
-    })
-    .join("\n");
-
-  const content = `
-Invoice No: ${invoice.invoiceNo}
-Appointment No: ${invoice.appointment.appointmentNo}
-Patient: ${invoice.appointment.patient.name}
-Patient Email: ${invoice.appointment.patient.email}
-Patient Phone: ${invoice.appointment.patient.phone ?? "N/A"}
-Issued By: ${invoice.issuedBy.name}
-Status: ${invoice.status}
-Due Date: ${invoice.dueDate ? invoice.dueDate.toDateString() : "N/A"}
-
-Items:
-${itemLines}
-
-Subtotal: ${invoice.subtotalAmount}
-Discount: ${invoice.discountAmount}
-Tax: ${invoice.taxAmount}
-Total: ${invoice.totalAmount}
-Paid: ${invoice.paidAmount}
-Due: ${invoice.dueAmount}
-`;
-
-  return {
-    filename: `${invoice.invoiceNo}.pdf`,
-    title: `Invoice ${invoice.invoiceNo}`,
-    content,
-    pdfUrl: invoice.pdfUrl,
-  };
-};
-
 export const InvoiceService = {
   getInvoices,
   createInvoice,
   getInvoiceById,
+  getInvoiceForTemplate,
   updateInvoice,
   deleteInvoice,
-  getInvoicePdfContent,
 };
