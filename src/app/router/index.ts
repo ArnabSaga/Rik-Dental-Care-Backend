@@ -7,6 +7,7 @@ import { MedicalHistoryRoutes } from "../module/medicalHistory/medicalHistory.ro
 import { PrescriptionRoutes } from "../module/prescription/prescription.route";
 import { ProfileRoutes } from "../module/profile/profile.route";
 import { UserRoutes } from "../module/user/user.route";
+import { NotificationRoutes } from '../module/notification/notification.route';
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: "/invoices",
     route: InvoiceRoutes,
+  },
+  {
+    path: "/notifications",
+    route: NotificationRoutes,
   },
 ];
 
