@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { AppointmentRoutes } from "../module/appointment/appointment.route";
 import { AuthRoutes } from "../module/auth/auth.route";
+import { ChatRoutes } from "../module/chat/chat.route";
 import { DentalServiceRoutes } from "../module/dentalService/dentalService.route";
 import { InvoiceRoutes } from "../module/invoice/invoice.route";
 import { MedicalHistoryRoutes } from "../module/medicalHistory/medicalHistory.route";
+import { NotificationRoutes } from "../module/notification/notification.route";
 import { PrescriptionRoutes } from "../module/prescription/prescription.route";
 import { ProfileRoutes } from "../module/profile/profile.route";
 import { UserRoutes } from "../module/user/user.route";
-import { NotificationRoutes } from '../module/notification/notification.route';
 
 const router = Router();
 
@@ -47,6 +48,10 @@ const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: "/notifications",
     route: NotificationRoutes,
+  },
+  {
+    path: "/chat",
+    route: ChatRoutes,
   },
 ];
 
