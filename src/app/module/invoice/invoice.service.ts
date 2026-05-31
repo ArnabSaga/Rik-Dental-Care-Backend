@@ -99,7 +99,10 @@ const ensureInvoiceAccess = async (invoiceId: string, authUser: User) => {
     patientId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this invoice");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this invoice",
+    );
   }
 
   return invoice;
@@ -122,7 +125,11 @@ const buildInvoiceItemsFromPayload = (items: IInvoiceItemPayload[]) => {
   return items.map((item) => {
     const quantity = item.quantity ?? 1;
     const discountAmount = item.discountAmount ?? 0;
-    const totalAmount = calculateLineTotal(quantity, item.unitPrice, discountAmount);
+    const totalAmount = calculateLineTotal(
+      quantity,
+      item.unitPrice,
+      discountAmount,
+    );
 
     return {
       serviceId: item.serviceId ?? null,
@@ -155,7 +162,7 @@ const buildInvoiceItemsFromAppointment = async (appointmentId: string) => {
   if (appointmentServices.length === 0) {
     throw new AppError(
       status.BAD_REQUEST,
-      "No appointment services found. Please provide invoice items manually"
+      "No appointment services found. Please provide invoice items manually",
     );
   }
 
@@ -181,7 +188,7 @@ const getInvoiceItemNumbers = (
     quantity: number;
     unitPrice: Prisma.Decimal;
     discountAmount: Prisma.Decimal;
-  }>
+  }>,
 ) => {
   return items.map((item) => ({
     quantity: item.quantity,
@@ -252,10 +259,13 @@ const getInvoices = async (query: IInvoiceQuery, authUser: User) => {
 const createInvoice = async (
   payload: ICreateInvoicePayload,
   authUser: User,
-  file?: Express.Multer.File
+  file?: Express.Multer.File,
 ) => {
   if (authUser.role !== INVOICE_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can create invoice");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can create invoice",
+    );
   }
 
   await ensureAppointmentForInvoice(payload.appointmentId);
@@ -271,7 +281,10 @@ const createInvoice = async (
   });
 
   if (existingInvoice) {
-    throw new AppError(status.CONFLICT, "Invoice already exists for this appointment");
+    throw new AppError(
+      status.CONFLICT,
+      "Invoice already exists for this appointment",
+    );
   }
 
   const items = payload.items
@@ -343,10 +356,13 @@ const updateInvoice = async (
   invoiceId: string,
   payload: IUpdateInvoicePayload,
   authUser: User,
-  file?: Express.Multer.File
+  file?: Express.Multer.File,
 ) => {
   if (authUser.role !== INVOICE_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can update invoice");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can update invoice",
+    );
   }
 
   const existingInvoice = await ensureInvoiceAccess(invoiceId, authUser);
@@ -355,7 +371,10 @@ const updateInvoice = async (
     existingInvoice.status === INVOICE_STATUS.CANCELLED ||
     existingInvoice.status === INVOICE_STATUS.REFUNDED
   ) {
-    throw new AppError(status.BAD_REQUEST, "Cancelled or refunded invoice cannot be updated");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Cancelled or refunded invoice cannot be updated",
+    );
   }
 
   const existingItems =
@@ -394,7 +413,9 @@ const updateInvoice = async (
   });
 
   const dueDate =
-    payload.dueDate !== undefined ? normalizeDate(payload.dueDate) : existingInvoice.dueDate;
+    payload.dueDate !== undefined
+      ? normalizeDate(payload.dueDate)
+      : existingInvoice.dueDate;
 
   const statusValue = resolveInvoiceStatus({
     requestedStatus: payload.status ?? existingInvoice.status,
@@ -426,46 +447,51 @@ const updateInvoice = async (
     throw new AppError(status.BAD_REQUEST, "No valid update data provided");
   }
 
-  const updatedInvoice = await prisma.$transaction(async (tx) => {
-    if (payload.items !== undefined) {
-      await tx.invoiceItem.deleteMany({
-        where: {
-          invoiceId,
-        },
-      });
-    }
+  const updatedInvoice = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      if (payload.items !== undefined) {
+        await tx.invoiceItem.deleteMany({
+          where: {
+            invoiceId,
+          },
+        });
+      }
 
-    return await tx.invoice.update({
-      where: {
-        id: invoiceId,
-      },
-      data: {
-        ...(updatePayload as Prisma.InvoiceUpdateInput),
-        ...(payload.items !== undefined
-          ? {
-              items: {
-                create: existingItems,
-              },
-            }
-          : {}),
-        ...(attachmentPayload
-          ? {
-              attachments: {
-                create: attachmentPayload,
-              },
-            }
-          : {}),
-      },
-      include: invoiceInclude,
-    });
-  });
+      return await tx.invoice.update({
+        where: {
+          id: invoiceId,
+        },
+        data: {
+          ...(updatePayload as Prisma.InvoiceUpdateInput),
+          ...(payload.items !== undefined
+            ? {
+                items: {
+                  create: existingItems,
+                },
+              }
+            : {}),
+          ...(attachmentPayload
+            ? {
+                attachments: {
+                  create: attachmentPayload,
+                },
+              }
+            : {}),
+        },
+        include: invoiceInclude,
+      });
+    },
+  );
 
   return updatedInvoice;
 };
 
 const deleteInvoice = async (invoiceId: string, authUser: User) => {
   if (authUser.role !== INVOICE_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can delete invoice");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can delete invoice",
+    );
   }
 
   await ensureInvoiceAccess(invoiceId, authUser);

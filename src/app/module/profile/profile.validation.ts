@@ -34,7 +34,16 @@ const patientProfile = z
     gender: z.enum(["MALE", "FEMALE", "OTHER"]).nullable().optional(),
 
     bloodGroup: z
-      .enum(["APLUS", "AMINUS", "BPLUS", "BMINUS", "ABPLUS", "ABMINUS", "OPLUS", "OMINUS"])
+      .enum([
+        "APLUS",
+        "AMINUS",
+        "BPLUS",
+        "BMINUS",
+        "ABPLUS",
+        "ABMINUS",
+        "OPLUS",
+        "OMINUS",
+      ])
       .nullable()
       .optional(),
 
@@ -60,7 +69,12 @@ const doctorProfile = z
     specialty: z.string().trim().max(150).nullable().optional(),
     designation: z.string().trim().max(150).nullable().optional(),
     bio: z.string().trim().max(2000).nullable().optional(),
-    signatureUrl: z.string().trim().url("Signature URL must be valid").nullable().optional(),
+    signatureUrl: z
+      .string()
+      .trim()
+      .url("Signature URL must be valid")
+      .nullable()
+      .optional(),
   })
   .strict();
 
@@ -77,14 +91,25 @@ const patientProfileQuery = z.object({
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 
   bloodGroup: z
-    .enum(["APLUS", "AMINUS", "BPLUS", "BMINUS", "ABPLUS", "ABMINUS", "OPLUS", "OMINUS"])
+    .enum([
+      "APLUS",
+      "AMINUS",
+      "BPLUS",
+      "BMINUS",
+      "ABPLUS",
+      "ABMINUS",
+      "OPLUS",
+      "OMINUS",
+    ])
     .optional(),
 
   page: z.union([z.string(), z.number()]).optional(),
 
   limit: z.union([z.string(), z.number()]).optional(),
 
-  sortBy: z.enum(["createdAt", "updatedAt", "dateOfBirth", "gender", "bloodGroup"]).optional(),
+  sortBy: z
+    .enum(["createdAt", "updatedAt", "dateOfBirth", "gender", "bloodGroup"])
+    .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),
 

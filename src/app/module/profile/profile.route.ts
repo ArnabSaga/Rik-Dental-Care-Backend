@@ -18,14 +18,14 @@ router.put(
   "/me/patient",
   validateRole(PROFILE_ROLE.PATIENT),
   validateRequest({ body: ProfileValidation.patientProfile }),
-  ProfileController.upsertMyPatientProfile
+  ProfileController.upsertMyPatientProfile,
 );
 
 router.patch(
   "/me/patient",
   validateRole(PROFILE_ROLE.PATIENT),
   validateRequest({ body: ProfileValidation.patientProfile }),
-  ProfileController.upsertMyPatientProfile
+  ProfileController.upsertMyPatientProfile,
 );
 
 // Doctor/Admin profile route
@@ -33,14 +33,14 @@ router.put(
   "/me/doctor",
   validateRole(PROFILE_ROLE.ADMIN),
   validateRequest({ body: ProfileValidation.doctorProfile }),
-  ProfileController.upsertMyDoctorProfile
+  ProfileController.upsertMyDoctorProfile,
 );
 
 router.patch(
   "/me/doctor",
   validateRole(PROFILE_ROLE.ADMIN),
   validateRequest({ body: ProfileValidation.doctorProfile }),
-  ProfileController.upsertMyDoctorProfile
+  ProfileController.upsertMyDoctorProfile,
 );
 
 // Manager profile route
@@ -48,14 +48,14 @@ router.put(
   "/me/manager",
   validateRole(PROFILE_ROLE.MANAGER),
   validateRequest({ body: ProfileValidation.managerProfile }),
-  ProfileController.upsertMyManagerProfile
+  ProfileController.upsertMyManagerProfile,
 );
 
 router.patch(
   "/me/manager",
   validateRole(PROFILE_ROLE.MANAGER),
   validateRequest({ body: ProfileValidation.managerProfile }),
-  ProfileController.upsertMyManagerProfile
+  ProfileController.upsertMyManagerProfile,
 );
 
 // Admin/Manager patient profile access
@@ -63,21 +63,21 @@ router.get(
   "/patients",
   validateRole(PROFILE_ROLE.ADMIN, PROFILE_ROLE.MANAGER),
   validateRequest({ query: ProfileValidation.patientProfileQuery }),
-  ProfileController.getAllPatientProfiles
+  ProfileController.getAllPatientProfiles,
 );
 
 router.get(
   "/patients/:id",
   validateRole(PROFILE_ROLE.ADMIN, PROFILE_ROLE.MANAGER),
   validateRequest({ params: ProfileValidation.idParam }),
-  ProfileController.getPatientProfileById
+  ProfileController.getPatientProfileById,
 );
 
 router.get(
   "/patients/user/:userId",
   validateRole(PROFILE_ROLE.ADMIN, PROFILE_ROLE.MANAGER),
   validateRequest({ params: ProfileValidation.userIdParam }),
-  ProfileController.getPatientProfileByUserId
+  ProfileController.getPatientProfileByUserId,
 );
 
 export const ProfileRoutes = router;

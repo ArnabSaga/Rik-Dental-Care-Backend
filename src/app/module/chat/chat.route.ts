@@ -11,25 +11,25 @@ router.use(requireAuth);
 router.get(
   "/conversations",
   validateRequest({ query: ChatValidation.getConversationsQuery }),
-  ChatController.getConversations
+  ChatController.getConversations,
 );
 
 router.post(
   "/conversations",
   validateRequest({ body: ChatValidation.createConversation }),
-  ChatController.createConversation
+  ChatController.createConversation,
 );
 
 router.get(
   "/conversations/:id",
   validateRequest({ params: ChatValidation.idParam }),
-  ChatController.getConversationById
+  ChatController.getConversationById,
 );
 
 router.delete(
   "/conversations/:id",
   validateRequest({ params: ChatValidation.idParam }),
-  ChatController.deleteConversation
+  ChatController.deleteConversation,
 );
 
 router.get(
@@ -38,7 +38,7 @@ router.get(
     params: ChatValidation.idParam,
     query: ChatValidation.getMessagesQuery,
   }),
-  ChatController.getMessages
+  ChatController.getMessages,
 );
 
 router.post(
@@ -47,21 +47,25 @@ router.post(
     params: ChatValidation.idParam,
     body: ChatValidation.sendMessage,
   }),
-  ChatController.sendMessage
+  ChatController.sendMessage,
 );
 
 router.patch(
   "/messages/:id/read",
   validateRequest({ params: ChatValidation.idParam }),
-  ChatController.markMessageAsRead
+  ChatController.markMessageAsRead,
 );
 
 router.delete(
   "/messages/:id",
   validateRequest({ params: ChatValidation.idParam }),
-  ChatController.deleteMessage
+  ChatController.deleteMessage,
 );
 
-router.post("/ai", validateRequest({ body: ChatValidation.aiChat }), ChatController.chatWithAi);
+router.post(
+  "/ai",
+  validateRequest({ body: ChatValidation.aiChat }),
+  ChatController.chatWithAi,
+);
 
 export const ChatRoutes = router;

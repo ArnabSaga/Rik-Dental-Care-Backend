@@ -29,26 +29,33 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     } else if (err instanceof ZodError) {
       console.error(`[${method} ${url}] [Zod Validation Error]:`, err.issues);
     } else if (err instanceof SyntaxError && "body" in err) {
-      console.error(`[${method} ${url}] [Syntax Error in Request Body]:`, err.message);
+      console.error(
+        `[${method} ${url}] [Syntax Error in Request Body]:`,
+        err.message,
+      );
     } else {
       console.error(`[${method} ${url}] Error:`, err);
     }
   }
 
   if (req.file && (req.file as Express.Multer.File).path) {
-    destroyCloudinaryAssetByUrl((req.file as Express.Multer.File).path).catch(console.error);
+    destroyCloudinaryAssetByUrl((req.file as Express.Multer.File).path).catch(
+      console.error,
+    );
   }
 
   if (req.files) {
     if (Array.isArray(req.files)) {
       req.files.forEach((file) => {
-        if (file.path) destroyCloudinaryAssetByUrl(file.path).catch(console.error);
+        if (file.path)
+          destroyCloudinaryAssetByUrl(file.path).catch(console.error);
       });
     } else {
       Object.values(req.files).forEach((fileArray) => {
         if (Array.isArray(fileArray)) {
           fileArray.forEach((file) => {
-            if (file.path) destroyCloudinaryAssetByUrl(file.path).catch(console.error);
+            if (file.path)
+              destroyCloudinaryAssetByUrl(file.path).catch(console.error);
           });
         }
       });

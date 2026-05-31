@@ -45,7 +45,7 @@ const ensurePatientProfileForUser = async (userId: string) => {
   if (!profile) {
     throw new AppError(
       status.BAD_REQUEST,
-      "Patient profile is required before adding medical history"
+      "Patient profile is required before adding medical history",
     );
   }
 
@@ -79,14 +79,17 @@ const ensurePatientProfileExists = async (patientProfileId: string) => {
 
 const resolvePatientProfileIdForCreate = async (
   payloadPatientProfileId: string | undefined,
-  authUser: User
+  authUser: User,
 ): Promise<string> => {
   if (authUser.role === MEDICAL_HISTORY_ROLE.PATIENT) {
     if (payloadPatientProfileId) {
       const profile = await ensurePatientProfileExists(payloadPatientProfileId);
 
       if (profile.userId !== authUser.id) {
-        throw new AppError(status.FORBIDDEN, "Patient can only create own medical history");
+        throw new AppError(
+          status.FORBIDDEN,
+          "Patient can only create own medical history",
+        );
       }
 
       return profile.id;
@@ -101,17 +104,26 @@ const resolvePatientProfileIdForCreate = async (
     authUser.role === MEDICAL_HISTORY_ROLE.MANAGER
   ) {
     if (!payloadPatientProfileId) {
-      throw new AppError(status.BAD_REQUEST, "patientProfileId is required for admin/manager");
+      throw new AppError(
+        status.BAD_REQUEST,
+        "patientProfileId is required for admin/manager",
+      );
     }
 
     const profile = await ensurePatientProfileExists(payloadPatientProfileId);
     return profile.id;
   }
 
-  throw new AppError(status.FORBIDDEN, "You are not allowed to create medical history");
+  throw new AppError(
+    status.FORBIDDEN,
+    "You are not allowed to create medical history",
+  );
 };
 
-const ensureMedicalHistoryAccess = async (medicalHistoryId: string, authUser: User) => {
+const ensureMedicalHistoryAccess = async (
+  medicalHistoryId: string,
+  authUser: User,
+) => {
   const medicalHistory = await prisma.medicalHistory.findFirst({
     where: {
       id: medicalHistoryId,
@@ -132,7 +144,10 @@ const ensureMedicalHistoryAccess = async (medicalHistoryId: string, authUser: Us
     patientUserId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this medical history");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this medical history",
+    );
   }
 
   return medicalHistory;
@@ -151,7 +166,10 @@ const buildAttachmentCreatePayload = (file?: Express.Multer.File) => {
   };
 };
 
-const getMedicalHistories = async (query: IMedicalHistoryQuery, authUser: User) => {
+const getMedicalHistories = async (
+  query: IMedicalHistoryQuery,
+  authUser: User,
+) => {
   const baseWhere: Prisma.MedicalHistoryWhereInput = {
     isDeleted: false,
     ...getMedicalHistoryDateRangeWhere(query),
@@ -201,11 +219,11 @@ const getMedicalHistories = async (query: IMedicalHistoryQuery, authUser: User) 
 const createMedicalHistory = async (
   payload: ICreateMedicalHistoryPayload,
   authUser: User,
-  file?: Express.Multer.File
+  file?: Express.Multer.File,
 ) => {
   const patientProfileId = await resolvePatientProfileIdForCreate(
     payload.patientProfileId,
-    authUser
+    authUser,
   );
 
   const attachmentPayload = buildAttachmentCreatePayload(file);
@@ -234,7 +252,10 @@ const createMedicalHistory = async (
   return medicalHistory;
 };
 
-const getMedicalHistoryById = async (medicalHistoryId: string, authUser: User) => {
+const getMedicalHistoryById = async (
+  medicalHistoryId: string,
+  authUser: User,
+) => {
   return await ensureMedicalHistoryAccess(medicalHistoryId, authUser);
 };
 
@@ -242,7 +263,7 @@ const updateMedicalHistory = async (
   medicalHistoryId: string,
   payload: IUpdateMedicalHistoryPayload,
   authUser: User,
-  file?: Express.Multer.File
+  file?: Express.Multer.File,
 ) => {
   await ensureMedicalHistoryAccess(medicalHistoryId, authUser);
 
@@ -282,7 +303,10 @@ const updateMedicalHistory = async (
   return updatedMedicalHistory;
 };
 
-const deleteMedicalHistory = async (medicalHistoryId: string, authUser: User) => {
+const deleteMedicalHistory = async (
+  medicalHistoryId: string,
+  authUser: User,
+) => {
   await ensureMedicalHistoryAccess(medicalHistoryId, authUser);
 
   const deletedMedicalHistory = await prisma.medicalHistory.update({

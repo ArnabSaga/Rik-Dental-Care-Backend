@@ -15,7 +15,12 @@ const updateMe = z
 
     phone: z.string().trim().min(5).max(20).nullable().optional(),
 
-    image: z.string().trim().url("Image must be a valid URL").nullable().optional(),
+    image: z
+      .string()
+      .trim()
+      .url("Image must be a valid URL")
+      .nullable()
+      .optional(),
   })
   .strict();
 
@@ -30,7 +35,12 @@ const updateByAdmin = z
 
     phone: z.string().trim().min(5).max(20).nullable().optional(),
 
-    image: z.string().trim().url("Image must be a valid URL").nullable().optional(),
+    image: z
+      .string()
+      .trim()
+      .url("Image must be a valid URL")
+      .nullable()
+      .optional(),
 
     role: z.enum(["ADMIN", "PATIENT", "MANAGER"]).optional(),
 
@@ -49,15 +59,21 @@ const getAllUsersQuery = z.object({
 
   status: z.enum(["ACTIVE", "INACTIVE", "BLOCKED"]).optional(),
 
-  isActive: z.union([z.boolean(), z.enum(["true", "false", "1", "0"])]).optional(),
+  isActive: z
+    .union([z.boolean(), z.enum(["true", "false", "1", "0"])])
+    .optional(),
 
-  emailVerified: z.union([z.boolean(), z.enum(["true", "false", "1", "0"])]).optional(),
+  emailVerified: z
+    .union([z.boolean(), z.enum(["true", "false", "1", "0"])])
+    .optional(),
 
   page: z.union([z.string(), z.number()]).optional(),
 
   limit: z.union([z.string(), z.number()]).optional(),
 
-  sortBy: z.enum(["name", "email", "role", "status", "createdAt", "updatedAt"]).optional(),
+  sortBy: z
+    .enum(["name", "email", "role", "status", "createdAt", "updatedAt"])
+    .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),
 

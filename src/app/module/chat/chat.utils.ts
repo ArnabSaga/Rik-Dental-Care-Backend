@@ -24,7 +24,12 @@ export const conversationSearchableFields = ["title"];
 
 export const conversationFilterableFields = ["patientId", "type"];
 
-export const conversationSortableFields = ["createdAt", "updatedAt", "type", "title"];
+export const conversationSortableFields = [
+  "createdAt",
+  "updatedAt",
+  "type",
+  "title",
+];
 
 export const conversationSelectableFields = [
   "id",
@@ -37,7 +42,11 @@ export const conversationSelectableFields = [
 
 export const messageSearchableFields = ["content"];
 
-export const messageFilterableFields = ["senderId", "recipientId", "senderType"];
+export const messageFilterableFields = [
+  "senderId",
+  "recipientId",
+  "senderType",
+];
 
 export const messageSortableFields = ["sentAt", "createdAt", "updatedAt"];
 
@@ -151,7 +160,7 @@ export const getParamId = (id: string | string[] | undefined): string => {
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -164,7 +173,9 @@ export const removeUndefinedFields = <T extends Record<string, unknown>>(
   return cleanPayload;
 };
 
-export const resolveSenderType = (role: string): "PATIENT" | "ADMIN" | "MANAGER" => {
+export const resolveSenderType = (
+  role: string,
+): "PATIENT" | "ADMIN" | "MANAGER" => {
   if (role === CHAT_ROLE.ADMIN) {
     return CHAT_SENDER_TYPE.ADMIN;
   }
@@ -204,7 +215,10 @@ export const buildAiSafeReply = (message: string): string => {
     return "You can view your invoice from the invoice section after your appointment is completed or after the clinic issues the invoice.";
   }
 
-  if (lowerMessage.includes("prescription") || lowerMessage.includes("medicine")) {
+  if (
+    lowerMessage.includes("prescription") ||
+    lowerMessage.includes("medicine")
+  ) {
     return "You can view your prescription from the prescription section after the doctor issues it. Please do not take medicine without professional guidance.";
   }
 

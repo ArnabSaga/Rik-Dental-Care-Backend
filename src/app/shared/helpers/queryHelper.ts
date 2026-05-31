@@ -33,7 +33,7 @@ export class QueryBuilder<
   constructor(
     private model: PrismaModelDelegate,
     private queryParams: IQueryParams,
-    private config: IQueryConfig = {}
+    private config: IQueryConfig = {},
   ) {
     //* Base find query
     this.query = {
@@ -69,8 +69,16 @@ export class QueryBuilder<
       return this;
     }
 
-    this.appendLogicalArray(this.query.where as PrismaWhereCondition, "OR", searchConditions);
-    this.appendLogicalArray(this.countQuery.where as PrismaWhereCondition, "OR", searchConditions);
+    this.appendLogicalArray(
+      this.query.where as PrismaWhereCondition,
+      "OR",
+      searchConditions,
+    );
+    this.appendLogicalArray(
+      this.countQuery.where as PrismaWhereCondition,
+      "OR",
+      searchConditions,
+    );
 
     return this;
   }
@@ -99,7 +107,9 @@ export class QueryBuilder<
       if (value === undefined || value === "") return;
 
       const isAllowedField =
-        !filterableFields || filterableFields.length === 0 || filterableFields.includes(key);
+        !filterableFields ||
+        filterableFields.length === 0 ||
+        filterableFields.includes(key);
 
       if (!isAllowedField) return;
 
@@ -110,11 +120,14 @@ export class QueryBuilder<
       }
     });
 
-    this.query.where = this.deepMerge(this.query.where as Record<string, unknown>, builtFilter);
+    this.query.where = this.deepMerge(
+      this.query.where as Record<string, unknown>,
+      builtFilter,
+    );
 
     this.countQuery.where = this.deepMerge(
       this.countQuery.where as Record<string, unknown>,
-      builtFilter
+      builtFilter,
     );
 
     return this;
@@ -129,7 +142,10 @@ export class QueryBuilder<
       sortOrder: this.queryParams.sortOrder,
     };
 
-    const paginationResult = paginationHelper.calculatePagination(paginationOptions, this.config);
+    const paginationResult = paginationHelper.calculatePagination(
+      paginationOptions,
+      this.config,
+    );
 
     this.page = paginationResult.page;
     this.limit = paginationResult.limit;
@@ -143,17 +159,20 @@ export class QueryBuilder<
 
   //* Apply sorting
   sort(): this {
-    const requestedSortBy = this.queryParams.sortBy || this.config.defaultSortBy || "createdAt";
+    const requestedSortBy =
+      this.queryParams.sortBy || this.config.defaultSortBy || "createdAt";
 
     const requestedSortOrder =
-      this.queryParams.sortOrder === "asc" || this.queryParams.sortOrder === "desc"
+      this.queryParams.sortOrder === "asc" ||
+      this.queryParams.sortOrder === "desc"
         ? this.queryParams.sortOrder
         : this.config.defaultSortOrder || "desc";
 
     const allowedSortFields = this.config.sortableFields ?? [];
 
     const isSortAllowed =
-      allowedSortFields.length === 0 || allowedSortFields.includes(requestedSortBy);
+      allowedSortFields.length === 0 ||
+      allowedSortFields.includes(requestedSortBy);
 
     const fallbackSortBy = this.config.defaultSortBy || "createdAt";
     const safeSortBy = isSortAllowed ? requestedSortBy : fallbackSortBy;
@@ -161,7 +180,10 @@ export class QueryBuilder<
     this.sortBy = safeSortBy;
     this.sortOrder = requestedSortOrder;
 
-    this.query.orderBy = this.buildSortCondition(safeSortBy, requestedSortOrder);
+    this.query.orderBy = this.buildSortCondition(
+      safeSortBy,
+      requestedSortOrder,
+    );
 
     return this;
   }
@@ -179,7 +201,10 @@ export class QueryBuilder<
       .split(",")
       .map((field) => field.trim())
       .filter(Boolean)
-      .filter((field) => selectableFields.length === 0 || selectableFields.includes(field));
+      .filter(
+        (field) =>
+          selectableFields.length === 0 || selectableFields.includes(field),
+      );
 
     if (fieldsArray.length === 0) {
       return this;
@@ -193,7 +218,10 @@ export class QueryBuilder<
       }
     });
 
-    this.query.select = this.selectFields as Record<string, boolean | Record<string, unknown>>;
+    this.query.select = this.selectFields as Record<
+      string,
+      boolean | Record<string, unknown>
+    >;
 
     //* select and include cannot be used together
     delete this.query.include;
@@ -216,7 +244,10 @@ export class QueryBuilder<
   }
 
   //* Add dynamic include from query param
-  dynamicInclude(includeConfig: Record<string, unknown>, defaultInclude: string[] = []): this {
+  dynamicInclude(
+    includeConfig: Record<string, unknown>,
+    defaultInclude: string[] = [],
+  ): this {
     if (this.selectFields) {
       return this;
     }
@@ -256,12 +287,12 @@ export class QueryBuilder<
   where(condition: TWhereInput): this {
     this.query.where = this.deepMerge(
       this.query.where as Record<string, unknown>,
-      condition as Record<string, unknown>
+      condition as Record<string, unknown>,
     );
 
     this.countQuery.where = this.deepMerge(
       this.countQuery.where as Record<string, unknown>,
-      condition as Record<string, unknown>
+      condition as Record<string, unknown>,
     );
 
     return this;
@@ -270,8 +301,12 @@ export class QueryBuilder<
   //* Execute findMany + count
   async execute(): Promise<IQueryResult<T>> {
     const [total, data] = await Promise.all([
-      this.model.count(this.countQuery as Parameters<typeof this.model.count>[0]),
-      this.model.findMany(this.query as Parameters<typeof this.model.findMany>[0]),
+      this.model.count(
+        this.countQuery as Parameters<typeof this.model.count>[0],
+      ),
+      this.model.findMany(
+        this.query as Parameters<typeof this.model.findMany>[0],
+      ),
     ]);
 
     const totalPages = Math.ceil(total / this.limit);
@@ -289,7 +324,9 @@ export class QueryBuilder<
 
   //* Execute only count
   async count(): Promise<number> {
-    return await this.model.count(this.countQuery as Parameters<typeof this.model.count>[0]);
+    return await this.model.count(
+      this.countQuery as Parameters<typeof this.model.count>[0],
+    );
   }
 
   //* Return built query
@@ -298,7 +335,10 @@ export class QueryBuilder<
   }
 
   //* Build search condition from path
-  private buildSearchCondition(field: string, searchTerm: string): Record<string, unknown> | null {
+  private buildSearchCondition(
+    field: string,
+    searchTerm: string,
+  ): Record<string, unknown> | null {
     const stringFilter: PrismaStringFilter = {
       contains: searchTerm,
       mode: "insensitive",
@@ -342,7 +382,10 @@ export class QueryBuilder<
   }
 
   //* Build filter condition from key/value
-  private buildFilterCondition(key: string, value: unknown): Record<string, unknown> | null {
+  private buildFilterCondition(
+    key: string,
+    value: unknown,
+  ): Record<string, unknown> | null {
     //* Direct field
     if (!key.includes(".")) {
       if (this.isRangeFilterObject(value)) {
@@ -392,7 +435,10 @@ export class QueryBuilder<
   }
 
   //* Build sort condition from path
-  private buildSortCondition(sortBy: string, sortOrder: "asc" | "desc"): Record<string, unknown> {
+  private buildSortCondition(
+    sortBy: string,
+    sortOrder: "asc" | "desc",
+  ): Record<string, unknown> {
     if (!sortBy.includes(".")) {
       return {
         [sortBy]: sortOrder,
@@ -422,7 +468,7 @@ export class QueryBuilder<
   private appendLogicalArray(
     target: PrismaWhereCondition,
     key: "OR" | "AND",
-    conditions: Record<string, unknown>[]
+    conditions: Record<string, unknown>[],
   ): void {
     const existing: Record<string, unknown>[] = Array.isArray(target[key])
       ? [...(target[key] as Record<string, unknown>[])]
@@ -433,13 +479,16 @@ export class QueryBuilder<
 
   //* Check if value is range filter object
   private isRangeFilterObject(
-    value: unknown
+    value: unknown,
   ): value is Record<string, string | number | string[] | number[]> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
   }
 
   //* Merge source into target directly
-  private deepMergeInPlace(target: Record<string, unknown>, source: Record<string, unknown>): void {
+  private deepMergeInPlace(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>,
+  ): void {
     const merged = this.deepMerge(target, source);
 
     Object.keys(target).forEach((key) => delete target[key]);
@@ -449,7 +498,7 @@ export class QueryBuilder<
   //* Deep merge two objects
   private deepMerge(
     target: Record<string, unknown>,
-    source: Record<string, unknown>
+    source: Record<string, unknown>,
   ): Record<string, unknown> {
     const result = { ...target };
 
@@ -474,7 +523,7 @@ export class QueryBuilder<
       ) {
         result[key] = this.deepMerge(
           targetValue as Record<string, unknown>,
-          sourceValue as Record<string, unknown>
+          sourceValue as Record<string, unknown>,
         );
         continue;
       }
@@ -499,7 +548,11 @@ export class QueryBuilder<
         return value;
       }
 
-      if (typeof value === "string" && value.trim() !== "" && !Number.isNaN(Number(value))) {
+      if (
+        typeof value === "string" &&
+        value.trim() !== "" &&
+        !Number.isNaN(Number(value))
+      ) {
         return Number(value);
       }
 
@@ -507,8 +560,13 @@ export class QueryBuilder<
         return {
           in: value
             .map((item) => {
-              if (typeof item === "number" && Number.isFinite(item)) return item;
-              if (typeof item === "string" && item.trim() !== "" && !Number.isNaN(Number(item))) {
+              if (typeof item === "number" && Number.isFinite(item))
+                return item;
+              if (
+                typeof item === "string" &&
+                item.trim() !== "" &&
+                !Number.isNaN(Number(item))
+              ) {
                 return Number(item);
               }
               return undefined;
@@ -543,7 +601,7 @@ export class QueryBuilder<
   //* Parse range operators
   private parseRangeFilter(
     key: string,
-    value: Record<string, string | number | string[] | number[]>
+    value: Record<string, string | number | string[] | number[]>,
   ): PrismaNumberFilter | PrismaStringFilter | Record<string, unknown> {
     const rangeQuery: Record<string, unknown> = {};
 
@@ -554,7 +612,12 @@ export class QueryBuilder<
       const operatorValue = value[operator];
 
       const parseItem = (item: any) => {
-        if (isNumeric && typeof item === "string" && item !== "" && !isNaN(Number(item))) {
+        if (
+          isNumeric &&
+          typeof item === "string" &&
+          item !== "" &&
+          !isNaN(Number(item))
+        ) {
           return Number(item);
         }
         if (isDate && typeof item === "string") {
@@ -591,7 +654,9 @@ export class QueryBuilder<
 
         case "in":
         case "notIn":
-          rangeQuery[operator] = Array.isArray(parsedValue) ? parsedValue : [parsedValue];
+          rangeQuery[operator] = Array.isArray(parsedValue)
+            ? parsedValue
+            : [parsedValue];
           break;
 
         default:

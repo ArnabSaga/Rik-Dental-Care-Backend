@@ -2,7 +2,10 @@ import { IQueryParams } from "../../shared/types/query.types";
 
 export type TChatUserRole = "ADMIN" | "PATIENT" | "MANAGER";
 
-export type TConversationType = "PATIENT_SUPPORT" | "AI_ASSISTANT" | "APPOINTMENT_RELATED";
+export type TConversationType =
+  | "PATIENT_SUPPORT"
+  | "AI_ASSISTANT"
+  | "APPOINTMENT_RELATED";
 
 export type TChatSenderType = "PATIENT" | "ADMIN" | "MANAGER" | "AI";
 

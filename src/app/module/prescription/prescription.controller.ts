@@ -9,7 +9,7 @@ import { getParamId } from "./prescription.utils";
 const getPrescriptions = catchAsync(async (req: Request, res: Response) => {
   const result = await PrescriptionService.getPrescriptions(
     req.query as IPrescriptionQuery,
-    req.user!
+    req.user!,
   );
 
   sendResponse(res, {
@@ -22,7 +22,11 @@ const getPrescriptions = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createPrescription = catchAsync(async (req: Request, res: Response) => {
-  const result = await PrescriptionService.createPrescription(req.body, req.user!, req.file);
+  const result = await PrescriptionService.createPrescription(
+    req.body,
+    req.user!,
+    req.file,
+  );
 
   sendResponse(res, {
     statusCode: status.CREATED,
@@ -35,7 +39,10 @@ const createPrescription = catchAsync(async (req: Request, res: Response) => {
 const getPrescriptionById = catchAsync(async (req: Request, res: Response) => {
   const prescriptionId = getParamId(req.params.id);
 
-  const result = await PrescriptionService.getPrescriptionById(prescriptionId, req.user!);
+  const result = await PrescriptionService.getPrescriptionById(
+    prescriptionId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -45,18 +52,23 @@ const getPrescriptionById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getPrescriptionByAppointmentId = catchAsync(async (req: Request, res: Response) => {
-  const appointmentId = getParamId(req.params.appointmentId);
+const getPrescriptionByAppointmentId = catchAsync(
+  async (req: Request, res: Response) => {
+    const appointmentId = getParamId(req.params.appointmentId);
 
-  const result = await PrescriptionService.getPrescriptionByAppointmentId(appointmentId, req.user!);
+    const result = await PrescriptionService.getPrescriptionByAppointmentId(
+      appointmentId,
+      req.user!,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Prescription fetched successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Prescription fetched successfully",
+      data: result,
+    });
+  },
+);
 
 const updatePrescription = catchAsync(async (req: Request, res: Response) => {
   const prescriptionId = getParamId(req.params.id);
@@ -65,7 +77,7 @@ const updatePrescription = catchAsync(async (req: Request, res: Response) => {
     prescriptionId,
     req.body,
     req.user!,
-    req.file
+    req.file,
   );
 
   sendResponse(res, {
@@ -79,7 +91,10 @@ const updatePrescription = catchAsync(async (req: Request, res: Response) => {
 const deletePrescription = catchAsync(async (req: Request, res: Response) => {
   const prescriptionId = getParamId(req.params.id);
 
-  const result = await PrescriptionService.deletePrescription(prescriptionId, req.user!);
+  const result = await PrescriptionService.deletePrescription(
+    prescriptionId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,

@@ -12,26 +12,26 @@ router.use(requireAuth);
 router.get(
   "/",
   validateRequest({ query: PrescriptionValidation.getPrescriptionsQuery }),
-  PrescriptionController.getPrescriptions
+  PrescriptionController.getPrescriptions,
 );
 
 router.post(
   "/",
   fileUpload.uploadTaskAttachment.single("attachmentFile"),
   validateRequest({ body: PrescriptionValidation.createPrescription }),
-  PrescriptionController.createPrescription
+  PrescriptionController.createPrescription,
 );
 
 router.get(
   "/appointment/:appointmentId",
   validateRequest({ params: PrescriptionValidation.appointmentIdParam }),
-  PrescriptionController.getPrescriptionByAppointmentId
+  PrescriptionController.getPrescriptionByAppointmentId,
 );
 
 router.get(
   "/:id",
   validateRequest({ params: PrescriptionValidation.idParam }),
-  PrescriptionController.getPrescriptionById
+  PrescriptionController.getPrescriptionById,
 );
 
 router.put(
@@ -41,7 +41,7 @@ router.put(
     params: PrescriptionValidation.idParam,
     body: PrescriptionValidation.updatePrescription,
   }),
-  PrescriptionController.updatePrescription
+  PrescriptionController.updatePrescription,
 );
 
 router.patch(
@@ -51,13 +51,13 @@ router.patch(
     params: PrescriptionValidation.idParam,
     body: PrescriptionValidation.updatePrescription,
   }),
-  PrescriptionController.updatePrescription
+  PrescriptionController.updatePrescription,
 );
 
 router.delete(
   "/:id",
   validateRequest({ params: PrescriptionValidation.idParam }),
-  PrescriptionController.deletePrescription
+  PrescriptionController.deletePrescription,
 );
 
 export const PrescriptionRoutes = router;

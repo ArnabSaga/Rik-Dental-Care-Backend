@@ -114,13 +114,16 @@ const register = async (payload: IRegisterPayload) => {
   });
 
   if (existingUser && !existingUser.isDeleted) {
-    throw new AppError(status.CONFLICT, "A user already exists with this email");
+    throw new AppError(
+      status.CONFLICT,
+      "A user already exists with this email",
+    );
   }
 
   if (existingUser?.isDeleted) {
     throw new AppError(
       status.CONFLICT,
-      "This email belongs to a deleted account. Please contact support"
+      "This email belongs to a deleted account. Please contact support",
     );
   }
 
@@ -130,7 +133,7 @@ const register = async (payload: IRegisterPayload) => {
         name: payload.name.trim(),
         email,
         password: payload.password,
-        role: payload.role ?? USER_ROLE.PATIENT,
+        role: USER_ROLE.PATIENT,
         phone: payload.phone,
         status: USER_STATUS.ACTIVE,
         isActive: true,
@@ -151,7 +154,10 @@ const register = async (payload: IRegisterPayload) => {
   };
 };
 
-const login = async (payload: ILoginPayload, req: Request): Promise<ILoginServiceResult> => {
+const login = async (
+  payload: ILoginPayload,
+  req: Request,
+): Promise<ILoginServiceResult> => {
   const email = normalizeEmail(payload.email);
 
   await ensureUserCanLogin(email);
@@ -259,7 +265,10 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
   }
 };
 
-const changePassword = async (payload: IChangePasswordPayload, req: Request) => {
+const changePassword = async (
+  payload: IChangePasswordPayload,
+  req: Request,
+) => {
   try {
     return await auth.api.changePassword({
       body: {
@@ -315,7 +324,8 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
       body: {
         provider: "google",
         callbackURL:
-          payload.callbackURL || `${normalizeUrl(envVars.FRONTEND_URL)}/auth/google-callback`,
+          payload.callbackURL ||
+          `${normalizeUrl(envVars.FRONTEND_URL)}/auth/google-callback`,
       },
     });
   } catch (error) {

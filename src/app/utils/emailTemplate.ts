@@ -1,9 +1,32 @@
 import ejs from "ejs";
+import fs from "fs";
 import status from "http-status";
 import nodemailer from "nodemailer";
 import path from "path";
+import { fileURLToPath } from "url";
 import { envVars } from "../config/env";
 import AppError from "../shared/errors/AppError";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const getTemplatesDir = () => {
+  const candidates = [
+    path.resolve(__dirname, "..", "templates"),
+    path.resolve(__dirname, "app", "templates"),
+    path.resolve(process.cwd(), "src", "app", "templates"),
+    path.resolve(process.cwd(), "dist", "app", "templates"),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return candidates[0];
+};
+
+const TEMPLATES_DIR = getTemplatesDir();
 
 export interface EmailAttachment {
   filename: string;
@@ -51,7 +74,7 @@ export const sendEmail = async ({
   text,
 }: SendEmailOptions): Promise<void> => {
   try {
-    const templatePath = path.join(process.cwd(), "src", "app", "templates", `${templateName}.ejs`);
+    const templatePath = path.join(TEMPLATES_DIR, `${templateName}.ejs`);
 
     const html = await ejs.renderFile(templatePath, templateData, {
       async: true,

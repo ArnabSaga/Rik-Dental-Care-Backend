@@ -30,7 +30,8 @@ interface EnvVars {
   };
 }
 
-const normalizeUrl = (url: string) => (url.endsWith("/") ? url.slice(0, -1) : url);
+const normalizeUrl = (url: string) =>
+  url.endsWith("/") ? url.slice(0, -1) : url;
 
 const envVariables = (): EnvVars => {
   const requiredEnvVars = [
@@ -57,7 +58,7 @@ const envVariables = (): EnvVars => {
     if (!process.env[variable]) {
       throw new AppError(
         status.INTERNAL_SERVER_ERROR,
-        `Environment variable {${variable}} is required but not defined in .env file.`
+        `Environment variable {${variable}} is required but not defined in .env file.`,
       );
     }
   });

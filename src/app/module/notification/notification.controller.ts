@@ -2,14 +2,17 @@ import { Request, Response } from "express";
 import status from "http-status";
 import { catchAsync } from "../../shared/helpers/catchAsync";
 import { sendResponse } from "../../shared/response/sendResponse";
-import { IMarkNotificationsReadPayload, INotificationQuery } from "./notification.interface";
+import {
+  IMarkNotificationsReadPayload,
+  INotificationQuery,
+} from "./notification.interface";
 import { NotificationService } from "./notification.service";
 import { getParamId } from "./notification.utils";
 
 const getNotifications = catchAsync(async (req: Request, res: Response) => {
   const result = await NotificationService.getNotifications(
     req.query as INotificationQuery,
-    req.user!
+    req.user!,
   );
 
   sendResponse(res, {
@@ -33,7 +36,10 @@ const getUnreadSummary = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createNotification = catchAsync(async (req: Request, res: Response) => {
-  const result = await NotificationService.createNotification(req.body, req.user!);
+  const result = await NotificationService.createNotification(
+    req.body,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.CREATED,
@@ -46,7 +52,10 @@ const createNotification = catchAsync(async (req: Request, res: Response) => {
 const getNotificationById = catchAsync(async (req: Request, res: Response) => {
   const notificationId = getParamId(req.params.id);
 
-  const result = await NotificationService.getNotificationById(notificationId, req.user!);
+  const result = await NotificationService.getNotificationById(
+    notificationId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -56,48 +65,62 @@ const getNotificationById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const markNotificationsAsRead = catchAsync(async (req: Request, res: Response) => {
-  const result = await NotificationService.markNotificationsAsRead(
-    req.body as IMarkNotificationsReadPayload,
-    req.user!
-  );
+const markNotificationsAsRead = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.markNotificationsAsRead(
+      req.body as IMarkNotificationsReadPayload,
+      req.user!,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Notifications marked as read successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Notifications marked as read successfully",
+      data: result,
+    });
+  },
+);
 
-const markSingleNotificationAsRead = catchAsync(async (req: Request, res: Response) => {
-  const notificationId = getParamId(req.params.id);
+const markSingleNotificationAsRead = catchAsync(
+  async (req: Request, res: Response) => {
+    const notificationId = getParamId(req.params.id);
 
-  const result = await NotificationService.markSingleNotificationAsRead(notificationId, req.user!);
+    const result = await NotificationService.markSingleNotificationAsRead(
+      notificationId,
+      req.user!,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Notification marked as read successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Notification marked as read successfully",
+      data: result,
+    });
+  },
+);
 
-const markAllNotificationsAsRead = catchAsync(async (req: Request, res: Response) => {
-  const result = await NotificationService.markAllNotificationsAsRead(req.user!);
+const markAllNotificationsAsRead = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.markAllNotificationsAsRead(
+      req.user!,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "All notifications marked as read successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "All notifications marked as read successfully",
+      data: result,
+    });
+  },
+);
 
 const deleteNotification = catchAsync(async (req: Request, res: Response) => {
   const notificationId = getParamId(req.params.id);
 
-  const result = await NotificationService.deleteNotification(notificationId, req.user!);
+  const result = await NotificationService.deleteNotification(
+    notificationId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,

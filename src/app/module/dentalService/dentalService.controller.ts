@@ -18,7 +18,9 @@ const createDentalService = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllDentalServices = catchAsync(async (req: Request, res: Response) => {
-  const result = await DentalServiceService.getAllDentalServices(req.query as IDentalServiceQuery);
+  const result = await DentalServiceService.getAllDentalServices(
+    req.query as IDentalServiceQuery,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -29,19 +31,21 @@ const getAllDentalServices = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getActiveDentalServices = catchAsync(async (req: Request, res: Response) => {
-  const result = await DentalServiceService.getActiveDentalServices(
-    req.query as IDentalServiceQuery
-  );
+const getActiveDentalServices = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await DentalServiceService.getActiveDentalServices(
+      req.query as IDentalServiceQuery,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Active dental services fetched successfully",
-    data: result.data,
-    meta: result.meta,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Active dental services fetched successfully",
+      data: result.data,
+      meta: result.meta,
+    });
+  },
+);
 
 const getDentalServiceById = catchAsync(async (req: Request, res: Response) => {
   const serviceId = getParamId(req.params.id);
@@ -56,23 +60,28 @@ const getDentalServiceById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getDentalServiceBySlug = catchAsync(async (req: Request, res: Response) => {
-  const slug = getParamId(req.params.slug);
+const getDentalServiceBySlug = catchAsync(
+  async (req: Request, res: Response) => {
+    const slug = getParamId(req.params.slug);
 
-  const result = await DentalServiceService.getDentalServiceBySlug(slug);
+    const result = await DentalServiceService.getDentalServiceBySlug(slug);
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Dental service fetched successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Dental service fetched successfully",
+      data: result,
+    });
+  },
+);
 
 const updateDentalService = catchAsync(async (req: Request, res: Response) => {
   const serviceId = getParamId(req.params.id);
 
-  const result = await DentalServiceService.updateDentalService(serviceId, req.body);
+  const result = await DentalServiceService.updateDentalService(
+    serviceId,
+    req.body,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -82,18 +91,23 @@ const updateDentalService = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateDentalServiceStatus = catchAsync(async (req: Request, res: Response) => {
-  const serviceId = getParamId(req.params.id);
+const updateDentalServiceStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const serviceId = getParamId(req.params.id);
 
-  const result = await DentalServiceService.updateDentalServiceStatus(serviceId, req.body);
+    const result = await DentalServiceService.updateDentalServiceStatus(
+      serviceId,
+      req.body,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Dental service status updated successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Dental service status updated successfully",
+      data: result,
+    });
+  },
+);
 
 const deleteDentalService = catchAsync(async (req: Request, res: Response) => {
   const serviceId = getParamId(req.params.id);

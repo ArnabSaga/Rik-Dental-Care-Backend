@@ -35,7 +35,12 @@ export const DEFAULT_APPOINTMENT_SLOT_MINUTES = 30;
 
 export const adminUserSearchableFields = ["name", "email", "phone"];
 
-export const adminUserFilterableFields = ["role", "status", "isActive", "emailVerified"];
+export const adminUserFilterableFields = [
+  "role",
+  "status",
+  "isActive",
+  "emailVerified",
+];
 
 export const adminUserSortableFields = [
   "name",
@@ -248,7 +253,7 @@ export const normalizeDateTime = (value: string | Date): Date => {
 
 export const ensureFutureDate = (
   date: Date,
-  message = "Appointment time must be in the future"
+  message = "Appointment time must be in the future",
 ) => {
   if (date <= new Date()) {
     throw new AppError(status.BAD_REQUEST, message);
@@ -256,9 +261,13 @@ export const ensureFutureDate = (
 };
 
 export const getSlotRange = (scheduledAt: Date) => {
-  const start = new Date(scheduledAt.getTime() - DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000);
+  const start = new Date(
+    scheduledAt.getTime() - DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000,
+  );
 
-  const end = new Date(scheduledAt.getTime() + DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000);
+  const end = new Date(
+    scheduledAt.getTime() + DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000,
+  );
 
   return {
     start,

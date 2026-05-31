@@ -12,15 +12,18 @@ const router = Router();
 router.get(
   "/public",
   validateRequest({ query: DentalServiceValidation.getAllDentalServicesQuery }),
-  DentalServiceController.getActiveDentalServices
+  DentalServiceController.getActiveDentalServices,
 );
 
-router.get("/public/slug/:slug", DentalServiceController.getDentalServiceBySlug);
+router.get(
+  "/public/slug/:slug",
+  DentalServiceController.getDentalServiceBySlug,
+);
 
 router.get(
   "/public/:id",
   validateRequest({ params: DentalServiceValidation.idParam }),
-  DentalServiceController.getDentalServiceById
+  DentalServiceController.getDentalServiceById,
 );
 
 // Protected routes
@@ -31,7 +34,7 @@ router.get(
   "/",
   validateRole(DENTAL_SERVICE_ROLE.ADMIN, DENTAL_SERVICE_ROLE.MANAGER),
   validateRequest({ query: DentalServiceValidation.getAllDentalServicesQuery }),
-  DentalServiceController.getAllDentalServices
+  DentalServiceController.getAllDentalServices,
 );
 
 // Admin can create service
@@ -39,7 +42,7 @@ router.post(
   "/",
   validateRole(DENTAL_SERVICE_ROLE.ADMIN),
   validateRequest({ body: DentalServiceValidation.createDentalService }),
-  DentalServiceController.createDentalService
+  DentalServiceController.createDentalService,
 );
 
 // Admin/Manager can view one service
@@ -47,7 +50,7 @@ router.get(
   "/:id",
   validateRole(DENTAL_SERVICE_ROLE.ADMIN, DENTAL_SERVICE_ROLE.MANAGER),
   validateRequest({ params: DentalServiceValidation.idParam }),
-  DentalServiceController.getDentalServiceById
+  DentalServiceController.getDentalServiceById,
 );
 
 // Admin can update service
@@ -58,7 +61,7 @@ router.put(
     params: DentalServiceValidation.idParam,
     body: DentalServiceValidation.updateDentalService,
   }),
-  DentalServiceController.updateDentalService
+  DentalServiceController.updateDentalService,
 );
 
 router.patch(
@@ -68,7 +71,7 @@ router.patch(
     params: DentalServiceValidation.idParam,
     body: DentalServiceValidation.updateDentalService,
   }),
-  DentalServiceController.updateDentalService
+  DentalServiceController.updateDentalService,
 );
 
 // Admin can activate/deactivate service
@@ -79,7 +82,7 @@ router.patch(
     params: DentalServiceValidation.idParam,
     body: DentalServiceValidation.updateDentalServiceStatus,
   }),
-  DentalServiceController.updateDentalServiceStatus
+  DentalServiceController.updateDentalServiceStatus,
 );
 
 // Admin can soft delete service
@@ -87,7 +90,7 @@ router.delete(
   "/:id",
   validateRole(DENTAL_SERVICE_ROLE.ADMIN),
   validateRequest({ params: DentalServiceValidation.idParam }),
-  DentalServiceController.deleteDentalService
+  DentalServiceController.deleteDentalService,
 );
 
 export const DentalServiceRoutes = router;

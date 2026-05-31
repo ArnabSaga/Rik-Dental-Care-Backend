@@ -56,7 +56,11 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
 const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
   const userId = getParamId(req.params.id);
 
-  const result = await UserService.updateUserByAdmin(userId, req.body, req.user!.id);
+  const result = await UserService.updateUserByAdmin(
+    userId,
+    req.body,
+    req.user!.id,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,

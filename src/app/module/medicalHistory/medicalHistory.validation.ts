@@ -22,7 +22,14 @@ const createMedicalHistory = z
     ]),
 
     type: z
-      .enum(["ALLERGY", "SURGERY", "DISEASE", "MEDICATION", "DENTAL_HISTORY", "OTHER"])
+      .enum([
+        "ALLERGY",
+        "SURGERY",
+        "DISEASE",
+        "MEDICATION",
+        "DENTAL_HISTORY",
+        "OTHER",
+      ])
       .optional()
       .default("OTHER"),
 
@@ -57,7 +64,14 @@ const updateMedicalHistory = z
       .optional(),
 
     type: z
-      .enum(["ALLERGY", "SURGERY", "DISEASE", "MEDICATION", "DENTAL_HISTORY", "OTHER"])
+      .enum([
+        "ALLERGY",
+        "SURGERY",
+        "DISEASE",
+        "MEDICATION",
+        "DENTAL_HISTORY",
+        "OTHER",
+      ])
       .optional(),
 
     allergy: z.string().trim().max(1000).nullable().optional(),
@@ -74,7 +88,14 @@ const getMedicalHistoryQuery = z.object({
   patientProfileId: z.string().trim().optional(),
 
   type: z
-    .enum(["ALLERGY", "SURGERY", "DISEASE", "MEDICATION", "DENTAL_HISTORY", "OTHER"])
+    .enum([
+      "ALLERGY",
+      "SURGERY",
+      "DISEASE",
+      "MEDICATION",
+      "DENTAL_HISTORY",
+      "OTHER",
+    ])
     .optional(),
 
   dateFrom: z.string().trim().optional(),
@@ -85,7 +106,9 @@ const getMedicalHistoryQuery = z.object({
 
   limit: z.union([z.string(), z.number()]).optional(),
 
-  sortBy: z.enum(["date", "createdAt", "updatedAt", "type", "title"]).optional(),
+  sortBy: z
+    .enum(["date", "createdAt", "updatedAt", "type", "title"])
+    .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),
 

@@ -12,20 +12,20 @@ router.use(requireAuth);
 router.get(
   "/",
   validateRequest({ query: MedicalHistoryValidation.getMedicalHistoryQuery }),
-  MedicalHistoryController.getMedicalHistories
+  MedicalHistoryController.getMedicalHistories,
 );
 
 router.post(
   "/",
   fileUpload.uploadTaskAttachment.single("attachmentFile"),
   validateRequest({ body: MedicalHistoryValidation.createMedicalHistory }),
-  MedicalHistoryController.createMedicalHistory
+  MedicalHistoryController.createMedicalHistory,
 );
 
 router.get(
   "/:id",
   validateRequest({ params: MedicalHistoryValidation.idParam }),
-  MedicalHistoryController.getMedicalHistoryById
+  MedicalHistoryController.getMedicalHistoryById,
 );
 
 router.put(
@@ -35,7 +35,7 @@ router.put(
     params: MedicalHistoryValidation.idParam,
     body: MedicalHistoryValidation.updateMedicalHistory,
   }),
-  MedicalHistoryController.updateMedicalHistory
+  MedicalHistoryController.updateMedicalHistory,
 );
 
 router.patch(
@@ -45,13 +45,13 @@ router.patch(
     params: MedicalHistoryValidation.idParam,
     body: MedicalHistoryValidation.updateMedicalHistory,
   }),
-  MedicalHistoryController.updateMedicalHistory
+  MedicalHistoryController.updateMedicalHistory,
 );
 
 router.delete(
   "/:id",
   validateRequest({ params: MedicalHistoryValidation.idParam }),
-  MedicalHistoryController.deleteMedicalHistory
+  MedicalHistoryController.deleteMedicalHistory,
 );
 
 export const MedicalHistoryRoutes = router;

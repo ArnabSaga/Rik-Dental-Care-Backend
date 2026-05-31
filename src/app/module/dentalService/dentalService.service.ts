@@ -129,7 +129,10 @@ const getDentalServiceBySlug = async (slug: string) => {
   return service;
 };
 
-const updateDentalService = async (id: string, payload: IUpdateDentalServicePayload) => {
+const updateDentalService = async (
+  id: string,
+  payload: IUpdateDentalServicePayload,
+) => {
   await ensureDentalServiceExists(id);
 
   const slug = await normalizeDentalServiceSlug(
@@ -137,13 +140,16 @@ const updateDentalService = async (id: string, payload: IUpdateDentalServicePayl
       name: payload.name,
       slug: payload.slug,
     },
-    id
+    id,
   );
 
   const cleanPayload = removeUndefinedFields({
     name: payload.name,
     description: payload.description,
-    basePrice: payload.basePrice !== undefined ? new Prisma.Decimal(payload.basePrice) : undefined,
+    basePrice:
+      payload.basePrice !== undefined
+        ? new Prisma.Decimal(payload.basePrice)
+        : undefined,
     slug,
     isActive: payload.isActive,
   });
@@ -165,7 +171,7 @@ const updateDentalService = async (id: string, payload: IUpdateDentalServicePayl
 
 const updateDentalServiceStatus = async (
   id: string,
-  payload: IUpdateDentalServiceStatusPayload
+  payload: IUpdateDentalServiceStatusPayload,
 ) => {
   await ensureDentalServiceExists(id);
 

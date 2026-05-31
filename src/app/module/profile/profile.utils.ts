@@ -57,7 +57,9 @@ export const getParamId = (id: string | string[] | undefined): string => {
   return id;
 };
 
-export const calculateAge = (dateOfBirth?: Date | string | null): number | null => {
+export const calculateAge = (
+  dateOfBirth?: Date | string | null,
+): number | null => {
   if (!dateOfBirth) return null;
 
   const birthDate = new Date(dateOfBirth);
@@ -71,7 +73,8 @@ export const calculateAge = (dateOfBirth?: Date | string | null): number | null 
   const monthDifference = today.getMonth() - birthDate.getMonth();
 
   const hasBirthdayPassedThisYear =
-    monthDifference > 0 || (monthDifference === 0 && today.getDate() >= birthDate.getDate());
+    monthDifference > 0 ||
+    (monthDifference === 0 && today.getDate() >= birthDate.getDate());
 
   if (!hasBirthdayPassedThisYear) {
     age -= 1;
@@ -80,7 +83,9 @@ export const calculateAge = (dateOfBirth?: Date | string | null): number | null 
   return age;
 };
 
-export const normalizeDate = (date?: string | Date | null): Date | null | undefined => {
+export const normalizeDate = (
+  date?: string | Date | null,
+): Date | null | undefined => {
   if (date === undefined) return undefined;
   if (date === null) return null;
 
@@ -93,14 +98,17 @@ export const normalizeDate = (date?: string | Date | null): Date | null | undefi
   const today = new Date();
 
   if (parsedDate > today) {
-    throw new AppError(status.BAD_REQUEST, "Date of birth cannot be in the future");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Date of birth cannot be in the future",
+    );
   }
 
   return parsedDate;
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -120,7 +128,7 @@ export const isPatientProfileCompleted = (
     dateOfBirth?: Date | string | null;
     gender?: string | null;
     bloodGroup?: string | null;
-  } | null
+  } | null,
 ): boolean => {
   if (!profile) return false;
 
@@ -129,13 +137,13 @@ export const isPatientProfileCompleted = (
     profile.emergencyContact &&
     profile.dateOfBirth &&
     profile.gender &&
-    profile.bloodGroup
+    profile.bloodGroup,
   );
 };
 
 export const buildProfileCompletionStatus = (
   role: "ADMIN" | "PATIENT" | "MANAGER",
-  isCompleted: boolean
+  isCompleted: boolean,
 ) => {
   const isProfileRequired = role === PROFILE_ROLE.PATIENT;
 

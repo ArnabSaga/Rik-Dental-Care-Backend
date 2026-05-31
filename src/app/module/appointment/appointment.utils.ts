@@ -154,7 +154,7 @@ export const normalizeDateTime = (value: string | Date): Date => {
 
 export const ensureFutureDate = (
   date: Date,
-  message = "Appointment time must be in the future"
+  message = "Appointment time must be in the future",
 ) => {
   if (date <= new Date()) {
     throw new AppError(status.BAD_REQUEST, message);
@@ -162,7 +162,7 @@ export const ensureFutureDate = (
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -196,8 +196,12 @@ export const generateAppointmentNo = async (): Promise<string> => {
 };
 
 export const getSlotRange = (scheduledAt: Date) => {
-  const start = new Date(scheduledAt.getTime() - DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000);
-  const end = new Date(scheduledAt.getTime() + DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000);
+  const start = new Date(
+    scheduledAt.getTime() - DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000,
+  );
+  const end = new Date(
+    scheduledAt.getTime() + DEFAULT_APPOINTMENT_SLOT_MINUTES * 60 * 1000,
+  );
 
   return {
     start,

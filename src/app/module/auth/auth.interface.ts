@@ -5,7 +5,6 @@ export interface IRegisterPayload {
   name: string;
   email: string;
   password: string;
-  role?: TAuthUserRole;
   phone?: string;
 }
 

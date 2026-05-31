@@ -11,7 +11,7 @@ import { logger } from "./logger";
 export const generatePDF = (
   title: string,
   content: string,
-  res: Response
+  res: Response,
 ): void => {
   try {
     const doc = new PDFDocument({ margin: 50 });
@@ -20,22 +20,16 @@ export const generatePDF = (
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=${title.replace(/\s+/g, "_")}.pdf`
+      `attachment; filename=${title.replace(/\s+/g, "_")}.pdf`,
     );
 
     // Pipe the PDF into the response
     doc.pipe(res);
 
     // Add Header
-    doc
-      .fontSize(25)
-      .text("Rik Dental Care", { align: "center" })
-      .moveDown();
+    doc.fontSize(25).text("Rik Dental Care", { align: "center" }).moveDown();
 
-    doc
-      .fontSize(18)
-      .text(title, { underline: true })
-      .moveDown();
+    doc.fontSize(18).text(title, { underline: true }).moveDown();
 
     // Add Content
     doc.fontSize(12).text(content, {
@@ -53,7 +47,7 @@ export const generatePDF = (
           `Generated on: ${new Date().toLocaleString()} - Page ${i + 1}`,
           50,
           doc.page.height - 50,
-          { align: "center" }
+          { align: "center" },
         );
     }
 

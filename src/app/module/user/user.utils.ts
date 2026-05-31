@@ -20,9 +20,21 @@ export const USER_STATUS = {
 
 export const userSearchableFields = ["name", "email", "phone"];
 
-export const userFilterableFields = ["role", "status", "isActive", "emailVerified"];
+export const userFilterableFields = [
+  "role",
+  "status",
+  "isActive",
+  "emailVerified",
+];
 
-export const userSortableFields = ["name", "email", "role", "status", "createdAt", "updatedAt"];
+export const userSortableFields = [
+  "name",
+  "email",
+  "role",
+  "status",
+  "createdAt",
+  "updatedAt",
+];
 
 export const userSelectableFields = [
   "id",
@@ -105,7 +117,7 @@ export const getAuthenticatedUser = async (req: Request): Promise<User> => {
 export const requireAuth: RequestHandler = async (
   req: Request,
   _res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     req.user = await getAuthenticatedUser(req);
@@ -116,7 +128,7 @@ export const requireAuth: RequestHandler = async (
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 

@@ -37,7 +37,11 @@ const bookEmergencyAppointment = z
     patientId: z.string().min(1, "Patient id is required").optional(),
 
     scheduledAt: z
-      .union([z.string().datetime("Invalid scheduledAt date/time"), z.string().min(1), z.date()])
+      .union([
+        z.string().datetime("Invalid scheduledAt date/time"),
+        z.string().min(1),
+        z.date(),
+      ])
       .optional(),
 
     description: z
@@ -57,7 +61,11 @@ const updateAppointment = z
     doctorId: z.string().min(1, "Doctor id is required").optional(),
 
     scheduledAt: z
-      .union([z.string().datetime("Invalid scheduledAt date/time"), z.string().min(1), z.date()])
+      .union([
+        z.string().datetime("Invalid scheduledAt date/time"),
+        z.string().min(1),
+        z.date(),
+      ])
       .optional(),
 
     status: z
@@ -118,7 +126,15 @@ const getAppointmentsQuery = z.object({
   limit: z.union([z.string(), z.number()]).optional(),
 
   sortBy: z
-    .enum(["appointmentNo", "scheduledAt", "createdAt", "updatedAt", "status", "priority", "type"])
+    .enum([
+      "appointmentNo",
+      "scheduledAt",
+      "createdAt",
+      "updatedAt",
+      "status",
+      "priority",
+      "type",
+    ])
     .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),

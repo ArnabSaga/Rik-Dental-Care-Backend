@@ -16,25 +16,25 @@ router.get("/dashboard", AdminController.getDashboardStats);
 router.get(
   "/users",
   validateRequest({ query: AdminValidation.getUsersQuery }),
-  AdminController.getUsers
+  AdminController.getUsers,
 );
 
 router.get(
   "/appointments",
   validateRequest({ query: AdminValidation.getAppointmentsQuery }),
-  AdminController.getAppointments
+  AdminController.getAppointments,
 );
 
 router.get(
   "/appointments/:id",
   validateRequest({ params: AdminValidation.idParam }),
-  AdminController.getAppointmentById
+  AdminController.getAppointmentById,
 );
 
 router.post(
   "/appointments",
   validateRequest({ body: AdminValidation.createAppointment }),
-  AdminController.createAppointment
+  AdminController.createAppointment,
 );
 
 export const AdminRoutes = router;

@@ -9,7 +9,7 @@ import { getParamId } from "./medicalHistory.utils";
 const getMedicalHistories = catchAsync(async (req: Request, res: Response) => {
   const result = await MedicalHistoryService.getMedicalHistories(
     req.query as IMedicalHistoryQuery,
-    req.user!
+    req.user!,
   );
 
   sendResponse(res, {
@@ -22,7 +22,11 @@ const getMedicalHistories = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createMedicalHistory = catchAsync(async (req: Request, res: Response) => {
-  const result = await MedicalHistoryService.createMedicalHistory(req.body, req.user!, req.file);
+  const result = await MedicalHistoryService.createMedicalHistory(
+    req.body,
+    req.user!,
+    req.file,
+  );
 
   sendResponse(res, {
     statusCode: status.CREATED,
@@ -32,18 +36,23 @@ const createMedicalHistory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMedicalHistoryById = catchAsync(async (req: Request, res: Response) => {
-  const medicalHistoryId = getParamId(req.params.id);
+const getMedicalHistoryById = catchAsync(
+  async (req: Request, res: Response) => {
+    const medicalHistoryId = getParamId(req.params.id);
 
-  const result = await MedicalHistoryService.getMedicalHistoryById(medicalHistoryId, req.user!);
+    const result = await MedicalHistoryService.getMedicalHistoryById(
+      medicalHistoryId,
+      req.user!,
+    );
 
-  sendResponse(res, {
-    statusCode: status.OK,
-    success: true,
-    message: "Medical history fetched successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "Medical history fetched successfully",
+      data: result,
+    });
+  },
+);
 
 const updateMedicalHistory = catchAsync(async (req: Request, res: Response) => {
   const medicalHistoryId = getParamId(req.params.id);
@@ -52,7 +61,7 @@ const updateMedicalHistory = catchAsync(async (req: Request, res: Response) => {
     medicalHistoryId,
     req.body,
     req.user!,
-    req.file
+    req.file,
   );
 
   sendResponse(res, {
@@ -66,7 +75,10 @@ const updateMedicalHistory = catchAsync(async (req: Request, res: Response) => {
 const deleteMedicalHistory = catchAsync(async (req: Request, res: Response) => {
   const medicalHistoryId = getParamId(req.params.id);
 
-  const result = await MedicalHistoryService.deleteMedicalHistory(medicalHistoryId, req.user!);
+  const result = await MedicalHistoryService.deleteMedicalHistory(
+    medicalHistoryId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,

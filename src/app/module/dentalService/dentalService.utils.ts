@@ -45,14 +45,17 @@ export const dentalServicePublicSelect = {
 
 export const getParamId = (id: string | string[] | undefined): string => {
   if (!id || Array.isArray(id)) {
-    throw new AppError(status.BAD_REQUEST, "Valid dental service id is required");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Valid dental service id is required",
+    );
   }
 
   return id;
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -67,12 +70,15 @@ export const removeUndefinedFields = <T extends Record<string, unknown>>(
 
 export const generateUniqueDentalServiceSlug = async (
   name: string,
-  existingServiceId?: string
+  existingServiceId?: string,
 ): Promise<string> => {
   const baseSlug = slugify(name);
 
   if (!baseSlug) {
-    throw new AppError(status.BAD_REQUEST, "Service name cannot generate valid slug");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Service name cannot generate valid slug",
+    );
   }
 
   let slug = baseSlug;
@@ -110,7 +116,7 @@ export const normalizeDentalServiceSlug = async (
     name?: string;
     slug?: string;
   },
-  existingServiceId?: string
+  existingServiceId?: string,
 ): Promise<string | undefined> => {
   if (value.slug) {
     const requestedSlug = slugify(value.slug);

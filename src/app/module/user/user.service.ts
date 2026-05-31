@@ -3,7 +3,11 @@ import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../shared/errors/AppError";
 import { QueryBuilder } from "../../shared/helpers/queryHelper";
-import { IAdminUpdateUserPayload, IUpdateMePayload, IUserListQuery } from "./user.interface";
+import {
+  IAdminUpdateUserPayload,
+  IUpdateMePayload,
+  IUserListQuery,
+} from "./user.interface";
 import {
   getPublicUserSelect,
   getUserSelect,
@@ -115,7 +119,7 @@ const getUserById = async (id: string) => {
 };
 
 const normalizeAdminUpdatePayload = (
-  payload: IAdminUpdateUserPayload
+  payload: IAdminUpdateUserPayload,
 ): Partial<IAdminUpdateUserPayload> => {
   const cleanPayload = removeUndefinedFields({
     name: payload.name,
@@ -131,7 +135,10 @@ const normalizeAdminUpdatePayload = (
     cleanPayload.isActive = true;
   }
 
-  if (cleanPayload.status === USER_STATUS.INACTIVE || cleanPayload.status === USER_STATUS.BLOCKED) {
+  if (
+    cleanPayload.status === USER_STATUS.INACTIVE ||
+    cleanPayload.status === USER_STATUS.BLOCKED
+  ) {
     cleanPayload.isActive = false;
   }
 
@@ -149,7 +156,7 @@ const normalizeAdminUpdatePayload = (
 const updateUserByAdmin = async (
   id: string,
   payload: IAdminUpdateUserPayload,
-  adminUserId: string
+  adminUserId: string,
 ) => {
   await ensureUserExists(id);
 
@@ -159,12 +166,22 @@ const updateUserByAdmin = async (
     throw new AppError(status.BAD_REQUEST, "No valid update data provided");
   }
 
-  if (id === adminUserId && cleanPayload.status && cleanPayload.status !== USER_STATUS.ACTIVE) {
-    throw new AppError(status.BAD_REQUEST, "Admin cannot deactivate own account");
+  if (
+    id === adminUserId &&
+    cleanPayload.status &&
+    cleanPayload.status !== USER_STATUS.ACTIVE
+  ) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Admin cannot deactivate own account",
+    );
   }
 
   if (id === adminUserId && cleanPayload.isActive === false) {
-    throw new AppError(status.BAD_REQUEST, "Admin cannot deactivate own account");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Admin cannot deactivate own account",
+    );
   }
 
   const updatedUser = await prisma.user.update({

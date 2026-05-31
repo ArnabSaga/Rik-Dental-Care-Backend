@@ -13,7 +13,10 @@ export const validateRole =
       }
 
       if (!allowedRoles.includes(req.user.role as TAllowedRole)) {
-        throw new AppError(status.FORBIDDEN, "You are not allowed to access this resource");
+        throw new AppError(
+          status.FORBIDDEN,
+          "You are not allowed to access this resource",
+        );
       }
 
       next();

@@ -105,7 +105,10 @@ const sendNotificationEmail = async (payload: {
   });
 };
 
-const ensureNotificationAccess = async (notificationId: string, authUser: User) => {
+const ensureNotificationAccess = async (
+  notificationId: string,
+  authUser: User,
+) => {
   const notification = await prisma.notification.findFirst({
     where: {
       id: notificationId,
@@ -119,10 +122,14 @@ const ensureNotificationAccess = async (notificationId: string, authUser: User) 
   }
 
   const canAccess =
-    authUser.role === NOTIFICATION_ROLE.ADMIN || notification.recipientId === authUser.id;
+    authUser.role === NOTIFICATION_ROLE.ADMIN ||
+    notification.recipientId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this notification");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this notification",
+    );
   }
 
   return notification;
@@ -252,9 +259,15 @@ const getUnreadSummary = async (authUser: User) => {
   };
 };
 
-const createNotification = async (payload: ICreateNotificationPayload, authUser?: User) => {
+const createNotification = async (
+  payload: ICreateNotificationPayload,
+  authUser?: User,
+) => {
   if (authUser && authUser.role !== NOTIFICATION_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only admin can manually create notification");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admin can manually create notification",
+    );
   }
 
   const recipient = await ensureRecipientExists(payload.recipientId);
@@ -286,7 +299,9 @@ const createNotification = async (payload: ICreateNotificationPayload, authUser?
   return notification;
 };
 
-const createSystemNotification = async (payload: ICreateNotificationPayload) => {
+const createSystemNotification = async (
+  payload: ICreateNotificationPayload,
+) => {
   const recipient = await ensureRecipientExists(payload.recipientId);
 
   const notification = await prisma.notification.create({
@@ -320,7 +335,10 @@ const getNotificationById = async (notificationId: string, authUser: User) => {
   return await ensureNotificationAccess(notificationId, authUser);
 };
 
-const markNotificationsAsRead = async (payload: IMarkNotificationsReadPayload, authUser: User) => {
+const markNotificationsAsRead = async (
+  payload: IMarkNotificationsReadPayload,
+  authUser: User,
+) => {
   const where: Prisma.NotificationWhereInput = {
     id: {
       in: payload.ids,
@@ -355,7 +373,10 @@ const markNotificationsAsRead = async (payload: IMarkNotificationsReadPayload, a
   };
 };
 
-const markSingleNotificationAsRead = async (notificationId: string, authUser: User) => {
+const markSingleNotificationAsRead = async (
+  notificationId: string,
+  authUser: User,
+) => {
   await ensureNotificationAccess(notificationId, authUser);
 
   const notification = await prisma.notification.update({

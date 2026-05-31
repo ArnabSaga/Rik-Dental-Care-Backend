@@ -30,7 +30,10 @@ const ensureAppointmentForPrescription = async (appointmentId: string) => {
       id: appointmentId,
       isDeleted: false,
       status: {
-        notIn: [PRESCRIPTION_APPOINTMENT_STATUS.CANCELLED, PRESCRIPTION_APPOINTMENT_STATUS.NO_SHOW],
+        notIn: [
+          PRESCRIPTION_APPOINTMENT_STATUS.CANCELLED,
+          PRESCRIPTION_APPOINTMENT_STATUS.NO_SHOW,
+        ],
       },
       patient: {
         is: {
@@ -49,13 +52,19 @@ const ensureAppointmentForPrescription = async (appointmentId: string) => {
   });
 
   if (!appointment) {
-    throw new AppError(status.NOT_FOUND, "Valid appointment not found for prescription");
+    throw new AppError(
+      status.NOT_FOUND,
+      "Valid appointment not found for prescription",
+    );
   }
 
   return appointment;
 };
 
-const ensurePrescriptionAccess = async (prescriptionId: string, authUser: User) => {
+const ensurePrescriptionAccess = async (
+  prescriptionId: string,
+  authUser: User,
+) => {
   const prescription = await prisma.prescription.findFirst({
     where: {
       id: prescriptionId,
@@ -76,13 +85,18 @@ const ensurePrescriptionAccess = async (prescriptionId: string, authUser: User) 
     patientId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this prescription");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this prescription",
+    );
   }
 
   return prescription;
 };
 
-const buildPrescriptionItemsCreatePayload = (items: IPrescriptionItemPayload[]) => {
+const buildPrescriptionItemsCreatePayload = (
+  items: IPrescriptionItemPayload[],
+) => {
   return items.map((item) => ({
     medicineName: item.medicineName,
     dosage: item.dosage,
@@ -165,10 +179,13 @@ const getPrescriptions = async (query: IPrescriptionQuery, authUser: User) => {
 const createPrescription = async (
   payload: ICreatePrescriptionPayload,
   authUser: User,
-  file?: Express.Multer.File
+  file?: Express.Multer.File,
 ) => {
   if (authUser.role !== PRESCRIPTION_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can create prescription");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can create prescription",
+    );
   }
 
   await ensureAppointmentForPrescription(payload.appointmentId);
@@ -184,7 +201,10 @@ const createPrescription = async (
   });
 
   if (existingPrescription) {
-    throw new AppError(status.CONFLICT, "Prescription already exists for this appointment");
+    throw new AppError(
+      status.CONFLICT,
+      "Prescription already exists for this appointment",
+    );
   }
 
   const attachmentPayload = buildAttachmentCreatePayload(file);
@@ -216,7 +236,10 @@ const getPrescriptionById = async (prescriptionId: string, authUser: User) => {
   return await ensurePrescriptionAccess(prescriptionId, authUser);
 };
 
-const getPrescriptionByAppointmentId = async (appointmentId: string, authUser: User) => {
+const getPrescriptionByAppointmentId = async (
+  appointmentId: string,
+  authUser: User,
+) => {
   const prescription = await prisma.prescription.findFirst({
     where: {
       appointmentId,
@@ -237,7 +260,10 @@ const getPrescriptionByAppointmentId = async (appointmentId: string, authUser: U
     patientId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this prescription");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this prescription",
+    );
   }
 
   return prescription;
@@ -247,10 +273,13 @@ const updatePrescription = async (
   prescriptionId: string,
   payload: IUpdatePrescriptionPayload,
   authUser: User,
-  file?: Express.Multer.File
+  file?: Express.Multer.File,
 ) => {
   if (authUser.role !== PRESCRIPTION_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can update prescription");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can update prescription",
+    );
   }
 
   await ensurePrescriptionAccess(prescriptionId, authUser);
@@ -272,46 +301,51 @@ const updatePrescription = async (
     throw new AppError(status.BAD_REQUEST, "No valid update data provided");
   }
 
-  const updatedPrescription = await prisma.$transaction(async (tx) => {
-    if (payload.items) {
-      await tx.prescriptionItem.deleteMany({
-        where: {
-          prescriptionId,
-        },
-      });
-    }
+  const updatedPrescription = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      if (payload.items) {
+        await tx.prescriptionItem.deleteMany({
+          where: {
+            prescriptionId,
+          },
+        });
+      }
 
-    return await tx.prescription.update({
-      where: {
-        id: prescriptionId,
-      },
-      data: {
-        ...(cleanPayload as Prisma.PrescriptionUpdateInput),
-        ...(payload.items
-          ? {
-              items: {
-                create: buildPrescriptionItemsCreatePayload(payload.items),
-              },
-            }
-          : {}),
-        ...(attachmentPayload
-          ? {
-              attachments: {
-                create: attachmentPayload,
-              },
-            }
-          : {}),
-      },
-      include: prescriptionInclude,
-    });
-  });
+      return await tx.prescription.update({
+        where: {
+          id: prescriptionId,
+        },
+        data: {
+          ...(cleanPayload as Prisma.PrescriptionUpdateInput),
+          ...(payload.items
+            ? {
+                items: {
+                  create: buildPrescriptionItemsCreatePayload(payload.items),
+                },
+              }
+            : {}),
+          ...(attachmentPayload
+            ? {
+                attachments: {
+                  create: attachmentPayload,
+                },
+              }
+            : {}),
+        },
+        include: prescriptionInclude,
+      });
+    },
+  );
 
   return updatedPrescription;
 };
 
 const deletePrescription = async (prescriptionId: string, authUser: User) => {
   if (authUser.role !== PRESCRIPTION_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can delete prescription");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can delete prescription",
+    );
   }
 
   await ensurePrescriptionAccess(prescriptionId, authUser);

@@ -11,15 +11,21 @@ const getUsersQuery = z.object({
 
   status: z.enum(["ACTIVE", "INACTIVE", "BLOCKED"]).optional(),
 
-  isActive: z.union([z.boolean(), z.enum(["true", "false", "1", "0"])]).optional(),
+  isActive: z
+    .union([z.boolean(), z.enum(["true", "false", "1", "0"])])
+    .optional(),
 
-  emailVerified: z.union([z.boolean(), z.enum(["true", "false", "1", "0"])]).optional(),
+  emailVerified: z
+    .union([z.boolean(), z.enum(["true", "false", "1", "0"])])
+    .optional(),
 
   page: z.union([z.string(), z.number()]).optional(),
 
   limit: z.union([z.string(), z.number()]).optional(),
 
-  sortBy: z.enum(["name", "email", "role", "status", "createdAt", "updatedAt"]).optional(),
+  sortBy: z
+    .enum(["name", "email", "role", "status", "createdAt", "updatedAt"])
+    .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),
 
@@ -60,7 +66,15 @@ const getAppointmentsQuery = z.object({
   limit: z.union([z.string(), z.number()]).optional(),
 
   sortBy: z
-    .enum(["appointmentNo", "scheduledAt", "createdAt", "updatedAt", "status", "priority", "type"])
+    .enum([
+      "appointmentNo",
+      "scheduledAt",
+      "createdAt",
+      "updatedAt",
+      "status",
+      "priority",
+      "type",
+    ])
     .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),

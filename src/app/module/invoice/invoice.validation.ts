@@ -45,15 +45,36 @@ const createInvoice = z
       .nullable()
       .optional(),
 
-    discountAmount: z.coerce.number().min(0, "Discount cannot be negative").optional().default(0),
+    discountAmount: z.coerce
+      .number()
+      .min(0, "Discount cannot be negative")
+      .optional()
+      .default(0),
 
-    taxAmount: z.coerce.number().min(0, "Tax cannot be negative").optional().default(0),
+    taxAmount: z.coerce
+      .number()
+      .min(0, "Tax cannot be negative")
+      .optional()
+      .default(0),
 
     status: z
-      .enum(["DRAFT", "ISSUED", "PARTIALLY_PAID", "PAID", "OVERDUE", "CANCELLED", "REFUNDED"])
+      .enum([
+        "DRAFT",
+        "ISSUED",
+        "PARTIALLY_PAID",
+        "PAID",
+        "OVERDUE",
+        "CANCELLED",
+        "REFUNDED",
+      ])
       .optional(),
 
-    pdfUrl: z.string().trim().url("PDF URL must be valid").nullable().optional(),
+    pdfUrl: z
+      .string()
+      .trim()
+      .url("PDF URL must be valid")
+      .nullable()
+      .optional(),
 
     items: z.array(invoiceItem).min(1).max(100).optional(),
   })
@@ -70,17 +91,36 @@ const updateInvoice = z
       .nullable()
       .optional(),
 
-    discountAmount: z.coerce.number().min(0, "Discount cannot be negative").optional(),
+    discountAmount: z.coerce
+      .number()
+      .min(0, "Discount cannot be negative")
+      .optional(),
 
     taxAmount: z.coerce.number().min(0, "Tax cannot be negative").optional(),
 
-    paidAmount: z.coerce.number().min(0, "Paid amount cannot be negative").optional(),
-
-    status: z
-      .enum(["DRAFT", "ISSUED", "PARTIALLY_PAID", "PAID", "OVERDUE", "CANCELLED", "REFUNDED"])
+    paidAmount: z.coerce
+      .number()
+      .min(0, "Paid amount cannot be negative")
       .optional(),
 
-    pdfUrl: z.string().trim().url("PDF URL must be valid").nullable().optional(),
+    status: z
+      .enum([
+        "DRAFT",
+        "ISSUED",
+        "PARTIALLY_PAID",
+        "PAID",
+        "OVERDUE",
+        "CANCELLED",
+        "REFUNDED",
+      ])
+      .optional(),
+
+    pdfUrl: z
+      .string()
+      .trim()
+      .url("PDF URL must be valid")
+      .nullable()
+      .optional(),
 
     items: z.array(invoiceItem).min(1).max(100).optional(),
   })
@@ -96,7 +136,15 @@ const getInvoicesQuery = z.object({
   patientId: z.string().trim().optional(),
 
   status: z
-    .enum(["DRAFT", "ISSUED", "PARTIALLY_PAID", "PAID", "OVERDUE", "CANCELLED", "REFUNDED"])
+    .enum([
+      "DRAFT",
+      "ISSUED",
+      "PARTIALLY_PAID",
+      "PAID",
+      "OVERDUE",
+      "CANCELLED",
+      "REFUNDED",
+    ])
     .optional(),
 
   dueDateFrom: z.string().trim().optional(),

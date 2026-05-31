@@ -27,7 +27,11 @@ export const ATTACHMENT_TYPE = {
 
 export const prescriptionSearchableFields = ["notes", "pdfUrl"];
 
-export const prescriptionFilterableFields = ["appointmentId", "createdById", "updatedById"];
+export const prescriptionFilterableFields = [
+  "appointmentId",
+  "createdById",
+  "updatedById",
+];
 
 export const prescriptionSortableFields = ["createdAt", "updatedAt"];
 
@@ -137,7 +141,7 @@ export const getParamId = (id: string | string[] | undefined): string => {
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -184,7 +188,7 @@ export const getPrescriptionCreatedAtRangeWhere = (query: {
 };
 
 export const getAttachmentTypeFromMime = (
-  mimeType?: string
+  mimeType?: string,
 ): "IMAGE" | "PDF" | "DOCUMENT" | "OTHER" => {
   if (!mimeType) return ATTACHMENT_TYPE.OTHER;
 
@@ -207,7 +211,9 @@ export const getAttachmentTypeFromMime = (
   return ATTACHMENT_TYPE.OTHER;
 };
 
-export const getUploadedFileUrl = (file?: Express.Multer.File): string | undefined => {
+export const getUploadedFileUrl = (
+  file?: Express.Multer.File,
+): string | undefined => {
   if (!file) return undefined;
 
   const possibleFile = file as Express.Multer.File & {
@@ -219,7 +225,9 @@ export const getUploadedFileUrl = (file?: Express.Multer.File): string | undefin
   return possibleFile.path || possibleFile.secure_url || possibleFile.url;
 };
 
-export const getUploadedFilePublicId = (file?: Express.Multer.File): string | undefined => {
+export const getUploadedFilePublicId = (
+  file?: Express.Multer.File,
+): string | undefined => {
   if (!file) return undefined;
 
   const possibleFile = file as Express.Multer.File & {

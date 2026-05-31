@@ -44,7 +44,12 @@ const createPrescription = z
 
     notes: z.string().trim().max(2000).nullable().optional(),
 
-    pdfUrl: z.string().trim().url("PDF URL must be valid").nullable().optional(),
+    pdfUrl: z
+      .string()
+      .trim()
+      .url("PDF URL must be valid")
+      .nullable()
+      .optional(),
 
     items: z
       .array(prescriptionItem)
@@ -57,7 +62,12 @@ const updatePrescription = z
   .object({
     notes: z.string().trim().max(2000).nullable().optional(),
 
-    pdfUrl: z.string().trim().url("PDF URL must be valid").nullable().optional(),
+    pdfUrl: z
+      .string()
+      .trim()
+      .url("PDF URL must be valid")
+      .nullable()
+      .optional(),
 
     items: z
       .array(prescriptionItem)

@@ -44,7 +44,10 @@ const getStatusCodeFromPrismaError = (errorCode: string): number => {
   }
 
   //! Connection / infrastructure errors
-  if (errorCode.startsWith("P1") || ["P2024", "P2037", "P6008"].includes(errorCode)) {
+  if (
+    errorCode.startsWith("P1") ||
+    ["P2024", "P2037", "P6008"].includes(errorCode)
+  ) {
     return status.SERVICE_UNAVAILABLE;
   }
 
@@ -80,7 +83,9 @@ const formatErrorMeta = (meta?: Record<string, unknown>): string => {
   const parts: string[] = [];
 
   if (meta.target) {
-    const target = Array.isArray(meta.target) ? meta.target.join(", ") : String(meta.target);
+    const target = Array.isArray(meta.target)
+      ? meta.target.join(", ")
+      : String(meta.target);
     parts.push(`Field(s): ${target}`);
   }
 
@@ -116,14 +121,16 @@ const formatErrorMeta = (meta?: Record<string, unknown>): string => {
 };
 
 export const handlePrismaClientKnownRequestError = (
-  error: Prisma.PrismaClientKnownRequestError
+  error: Prisma.PrismaClientKnownRequestError,
 ): TErrorResponse => {
   const statusCode = getStatusCodeFromPrismaError(error.code);
   const mainMessage = getMainMessage(
     error.message,
-    "An error occurred with the database operation."
+    "An error occurred with the database operation.",
   );
-  const metaInfo = formatErrorMeta(error.meta as Record<string, unknown> | undefined);
+  const metaInfo = formatErrorMeta(
+    error.meta as Record<string, unknown> | undefined,
+  );
 
   const errorSources: TErrorSources[] = [
     {
@@ -148,11 +155,11 @@ export const handlePrismaClientKnownRequestError = (
 };
 
 export const handlePrismaClientUnknownError = (
-  error: Prisma.PrismaClientUnknownRequestError
+  error: Prisma.PrismaClientUnknownRequestError,
 ): TErrorResponse => {
   const mainMessage = getMainMessage(
     error.message,
-    "An unknown error occurred with the database operation."
+    "An unknown error occurred with the database operation.",
   );
 
   const errorSources: TErrorSources[] = [
@@ -171,7 +178,7 @@ export const handlePrismaClientUnknownError = (
 };
 
 export const handlePrismaClientValidationError = (
-  error: Prisma.PrismaClientValidationError
+  error: Prisma.PrismaClientValidationError,
 ): TErrorResponse => {
   const cleanMessage = cleanPrismaMessage(error.message);
 
@@ -184,7 +191,10 @@ export const handlePrismaClientValidationError = (
   const fieldName = fieldMatch ? fieldMatch[1] : "unknown";
 
   const mainMessage =
-    lines.find((line) => !line.includes("Argument") && !line.includes("→") && line.length > 10) ||
+    lines.find(
+      (line) =>
+        !line.includes("Argument") && !line.includes("→") && line.length > 10,
+    ) ||
     lines[0] ||
     "Invalid query parameters provided to the database operation.";
 
@@ -204,7 +214,7 @@ export const handlePrismaClientValidationError = (
 };
 
 export const handlePrismaClientInitializationError = (
-  error: Prisma.PrismaClientInitializationError
+  error: Prisma.PrismaClientInitializationError,
 ): TErrorResponse => {
   const statusCode = error.errorCode
     ? getStatusCodeFromPrismaError(error.errorCode)
@@ -212,7 +222,7 @@ export const handlePrismaClientInitializationError = (
 
   const mainMessage = getMainMessage(
     error.message,
-    "An error occurred while initializing the Prisma Client."
+    "An error occurred while initializing the Prisma Client.",
   );
 
   const errorSources: TErrorSources[] = [

@@ -1,4 +1,10 @@
-import { format, isAfter, isBefore, parseISO, differenceInYears } from "date-fns";
+import {
+  format,
+  isAfter,
+  isBefore,
+  parseISO,
+  differenceInYears,
+} from "date-fns";
 
 /**
  * Format a date to a readable string
@@ -34,7 +40,10 @@ export const calculateAge = (dob: Date | string): number => {
 /**
  * Check if first date is after second date
  */
-export const isDateAfter = (date1: Date | string, date2: Date | string): boolean => {
+export const isDateAfter = (
+  date1: Date | string,
+  date2: Date | string,
+): boolean => {
   const d1 = typeof date1 === "string" ? parseISO(date1) : date1;
   const d2 = typeof date2 === "string" ? parseISO(date2) : date2;
   return isAfter(d1, d2);
@@ -43,7 +52,10 @@ export const isDateAfter = (date1: Date | string, date2: Date | string): boolean
 /**
  * Check if first date is before second date
  */
-export const isDateBefore = (date1: Date | string, date2: Date | string): boolean => {
+export const isDateBefore = (
+  date1: Date | string,
+  date2: Date | string,
+): boolean => {
   const d1 = typeof date1 === "string" ? parseISO(date1) : date1;
   const d2 = typeof date2 === "string" ? parseISO(date2) : date2;
   return isBefore(d1, d2);

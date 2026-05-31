@@ -77,17 +77,23 @@ const ensureUserExists = async (userId: string) => {
 
 const resolveConversationPatientId = async (
   payloadPatientId: string | undefined,
-  authUser: User
+  authUser: User,
 ): Promise<string | undefined> => {
   if (authUser.role === CHAT_ROLE.PATIENT) {
     if (payloadPatientId && payloadPatientId !== authUser.id) {
-      throw new AppError(status.FORBIDDEN, "Patient can only create own conversation");
+      throw new AppError(
+        status.FORBIDDEN,
+        "Patient can only create own conversation",
+      );
     }
 
     return authUser.id;
   }
 
-  if (authUser.role === CHAT_ROLE.ADMIN || authUser.role === CHAT_ROLE.MANAGER) {
+  if (
+    authUser.role === CHAT_ROLE.ADMIN ||
+    authUser.role === CHAT_ROLE.MANAGER
+  ) {
     if (!payloadPatientId) {
       return undefined;
     }
@@ -96,10 +102,16 @@ const resolveConversationPatientId = async (
     return payloadPatientId;
   }
 
-  throw new AppError(status.FORBIDDEN, "You are not allowed to create conversation");
+  throw new AppError(
+    status.FORBIDDEN,
+    "You are not allowed to create conversation",
+  );
 };
 
-const ensureConversationAccess = async (conversationId: string, authUser: User) => {
+const ensureConversationAccess = async (
+  conversationId: string,
+  authUser: User,
+) => {
   const conversation = await prisma.conversation.findFirst({
     where: {
       id: conversationId,
@@ -118,7 +130,10 @@ const ensureConversationAccess = async (conversationId: string, authUser: User) 
     conversation.patientId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this conversation");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this conversation",
+    );
   }
 
   return conversation;
@@ -137,7 +152,10 @@ const ensureMessageAccess = async (messageId: string, authUser: User) => {
     throw new AppError(status.NOT_FOUND, "Message not found");
   }
 
-  const conversation = await ensureConversationAccess(message.conversationId, authUser);
+  const conversation = await ensureConversationAccess(
+    message.conversationId,
+    authUser,
+  );
 
   return {
     message,
@@ -186,8 +204,14 @@ const getConversations = async (query: IConversationQuery, authUser: User) => {
   return result;
 };
 
-const createConversation = async (payload: ICreateConversationPayload, authUser: User) => {
-  const patientId = await resolveConversationPatientId(payload.patientId, authUser);
+const createConversation = async (
+  payload: ICreateConversationPayload,
+  authUser: User,
+) => {
+  const patientId = await resolveConversationPatientId(
+    payload.patientId,
+    authUser,
+  );
 
   const conversation = await prisma.conversation.create({
     data: {
@@ -235,7 +259,11 @@ const deleteConversation = async (conversationId: string, authUser: User) => {
   return deletedConversation;
 };
 
-const getMessages = async (conversationId: string, query: IMessageQuery, authUser: User) => {
+const getMessages = async (
+  conversationId: string,
+  query: IMessageQuery,
+  authUser: User,
+) => {
   await ensureConversationAccess(conversationId, authUser);
 
   const queryBuilder = new QueryBuilder(prisma.chatMessage, query, {
@@ -268,7 +296,7 @@ const getMessages = async (conversationId: string, query: IMessageQuery, authUse
 const sendMessage = async (
   conversationId: string,
   payload: ISendMessagePayload,
-  authUser: User
+  authUser: User,
 ) => {
   const conversation = await ensureConversationAccess(conversationId, authUser);
 
@@ -276,7 +304,8 @@ const sendMessage = async (
     await ensureUserExists(payload.recipientId);
   }
 
-  const defaultRecipientId = authUser.role === CHAT_ROLE.PATIENT ? null : conversation.patientId;
+  const defaultRecipientId =
+    authUser.role === CHAT_ROLE.PATIENT ? null : conversation.patientId;
 
   const message = await prisma.chatMessage.create({
     data: {
@@ -302,7 +331,10 @@ const sendMessage = async (
 };
 
 const markMessageAsRead = async (messageId: string, authUser: User) => {
-  const { message, conversation } = await ensureMessageAccess(messageId, authUser);
+  const { message, conversation } = await ensureMessageAccess(
+    messageId,
+    authUser,
+  );
 
   const canMark =
     authUser.role === CHAT_ROLE.ADMIN ||
@@ -311,7 +343,10 @@ const markMessageAsRead = async (messageId: string, authUser: User) => {
     conversation.patientId === authUser.id;
 
   if (!canMark) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to mark this message as read");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to mark this message as read",
+    );
   }
 
   const updatedMessage = await prisma.chatMessage.update({
@@ -336,7 +371,10 @@ const deleteMessage = async (messageId: string, authUser: User) => {
     message.senderId === authUser.id;
 
   if (!canDelete) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to delete this message");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to delete this message",
+    );
   }
 
   const deletedMessage = await prisma.chatMessage.update({
@@ -355,18 +393,24 @@ const deleteMessage = async (messageId: string, authUser: User) => {
 
 const chatWithAi = async (payload: IAiChatPayload, authUser: User) => {
   if (authUser.role !== CHAT_ROLE.PATIENT) {
-    throw new AppError(status.FORBIDDEN, "Only patients can use AI assistant chat");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only patients can use AI assistant chat",
+    );
   }
 
   let conversationId = payload.conversationId;
 
   if (conversationId) {
-    const conversation = await ensureConversationAccess(conversationId, authUser);
+    const conversation = await ensureConversationAccess(
+      conversationId,
+      authUser,
+    );
 
     if (conversation.type !== CONVERSATION_TYPE.AI_ASSISTANT) {
       throw new AppError(
         status.BAD_REQUEST,
-        "This conversation is not an AI assistant conversation"
+        "This conversation is not an AI assistant conversation",
       );
     }
   } else {

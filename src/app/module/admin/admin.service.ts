@@ -30,7 +30,9 @@ import {
   normalizeDateTime,
 } from "./admin.utils";
 
-const parseBoolean = (value: string | boolean | undefined): boolean | undefined => {
+const parseBoolean = (
+  value: string | boolean | undefined,
+): boolean | undefined => {
   if (value === undefined) return undefined;
 
   if (typeof value === "boolean") return value;
@@ -113,12 +115,15 @@ const ensurePatientProfileCompleted = async (patientId: string) => {
   ) {
     throw new AppError(
       status.BAD_REQUEST,
-      "Patient profile is incomplete. Complete profile before appointment booking"
+      "Patient profile is incomplete. Complete profile before appointment booking",
     );
   }
 };
 
-const checkAppointmentConflict = async (treatedById: string, scheduledAt: Date) => {
+const checkAppointmentConflict = async (
+  treatedById: string,
+  scheduledAt: Date,
+) => {
   const { start, end } = getSlotRange(scheduledAt);
 
   const conflict = await prisma.appointment.findFirst({
@@ -147,17 +152,21 @@ const checkAppointmentConflict = async (treatedById: string, scheduledAt: Date) 
   if (conflict) {
     throw new AppError(
       status.CONFLICT,
-      `Doctor already has appointment ${conflict.appointmentNo} around ${conflict.scheduledAt.toISOString()}`
+      `Doctor already has appointment ${conflict.appointmentNo} around ${conflict.scheduledAt.toISOString()}`,
     );
   }
 };
 
-const prepareAppointmentServices = async (services?: IAdminAppointmentServicePayload[]) => {
+const prepareAppointmentServices = async (
+  services?: IAdminAppointmentServicePayload[],
+) => {
   if (!services || services.length === 0) {
     return [];
   }
 
-  const uniqueServiceIds = [...new Set(services.map((service) => service.serviceId))];
+  const uniqueServiceIds = [
+    ...new Set(services.map((service) => service.serviceId)),
+  ];
 
   const dentalServices = await prisma.dentalService.findMany({
     where: {
@@ -174,10 +183,15 @@ const prepareAppointmentServices = async (services?: IAdminAppointmentServicePay
   });
 
   if (dentalServices.length !== uniqueServiceIds.length) {
-    throw new AppError(status.BAD_REQUEST, "One or more dental services are invalid or inactive");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "One or more dental services are invalid or inactive",
+    );
   }
 
-  const servicePriceMap = new Map(dentalServices.map((service) => [service.id, service.basePrice]));
+  const servicePriceMap = new Map(
+    dentalServices.map((service) => [service.id, service.basePrice]),
+  );
 
   return services.map((service) => ({
     serviceId: service.serviceId,
@@ -460,7 +474,10 @@ const getAppointmentById = async (appointmentId: string) => {
   return appointment;
 };
 
-const createAppointment = async (payload: IAdminCreateAppointmentPayload, authUser: User) => {
+const createAppointment = async (
+  payload: IAdminCreateAppointmentPayload,
+  authUser: User,
+) => {
   const scheduledAt = normalizeDateTime(payload.scheduledAt);
 
   ensureFutureDate(scheduledAt);
@@ -470,7 +487,9 @@ const createAppointment = async (payload: IAdminCreateAppointmentPayload, authUs
   await ensureDoctorExists(payload.doctorId);
   await checkAppointmentConflict(payload.doctorId, scheduledAt);
 
-  const appointmentServices = await prepareAppointmentServices(payload.services);
+  const appointmentServices = await prepareAppointmentServices(
+    payload.services,
+  );
   const appointmentNo = await generateAdminAppointmentNo();
 
   const appointmentType = payload.type ?? ADMIN_APPOINTMENT_TYPE.REGULAR;

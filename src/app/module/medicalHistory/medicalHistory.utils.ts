@@ -34,7 +34,13 @@ export const medicalHistorySearchableFields = [
 
 export const medicalHistoryFilterableFields = ["patientProfileId", "type"];
 
-export const medicalHistorySortableFields = ["date", "createdAt", "updatedAt", "type", "title"];
+export const medicalHistorySortableFields = [
+  "date",
+  "createdAt",
+  "updatedAt",
+  "type",
+  "title",
+];
 
 export const medicalHistorySelectableFields = [
   "id",
@@ -88,7 +94,10 @@ export const medicalHistoryInclude = {
 
 export const getParamId = (id: string | string[] | undefined): string => {
   if (!id || Array.isArray(id)) {
-    throw new AppError(status.BAD_REQUEST, "Valid medical history id is required");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Valid medical history id is required",
+    );
   }
 
   return id;
@@ -105,7 +114,7 @@ export const normalizeDate = (value: string | Date): Date => {
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -119,7 +128,7 @@ export const removeUndefinedFields = <T extends Record<string, unknown>>(
 };
 
 export const getAttachmentTypeFromMime = (
-  mimeType?: string
+  mimeType?: string,
 ): "IMAGE" | "PDF" | "DOCUMENT" | "OTHER" => {
   if (!mimeType) return ATTACHMENT_TYPE.OTHER;
 
@@ -142,7 +151,9 @@ export const getAttachmentTypeFromMime = (
   return ATTACHMENT_TYPE.OTHER;
 };
 
-export const getUploadedFileUrl = (file?: Express.Multer.File): string | undefined => {
+export const getUploadedFileUrl = (
+  file?: Express.Multer.File,
+): string | undefined => {
   if (!file) return undefined;
 
   const possibleFile = file as Express.Multer.File & {
@@ -154,7 +165,9 @@ export const getUploadedFileUrl = (file?: Express.Multer.File): string | undefin
   return possibleFile.path || possibleFile.secure_url || possibleFile.url;
 };
 
-export const getUploadedFilePublicId = (file?: Express.Multer.File): string | undefined => {
+export const getUploadedFilePublicId = (
+  file?: Express.Multer.File,
+): string | undefined => {
   if (!file) return undefined;
 
   const possibleFile = file as Express.Multer.File & {

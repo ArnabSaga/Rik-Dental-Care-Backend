@@ -14,7 +14,7 @@ router.use(requireAuth);
 router.get(
   "/",
   validateRequest({ query: InvoiceValidation.getInvoicesQuery }),
-  InvoiceController.getInvoices
+  InvoiceController.getInvoices,
 );
 
 router.post(
@@ -22,25 +22,25 @@ router.post(
   validateRole(INVOICE_ROLE.ADMIN),
   fileUpload.uploadTaskAttachment.single("attachmentFile"),
   validateRequest({ body: InvoiceValidation.createInvoice }),
-  InvoiceController.createInvoice
+  InvoiceController.createInvoice,
 );
 
 router.get(
   "/preview/:id",
   validateRequest({ params: InvoiceValidation.idParam }),
-  InvoiceController.renderInvoice
+  InvoiceController.renderInvoice,
 );
 
 router.get(
   "/download/:id",
   validateRequest({ params: InvoiceValidation.idParam }),
-  InvoiceController.downloadInvoice
+  InvoiceController.downloadInvoice,
 );
 
 router.get(
   "/:id",
   validateRequest({ params: InvoiceValidation.idParam }),
-  InvoiceController.getInvoiceById
+  InvoiceController.getInvoiceById,
 );
 
 router.put(
@@ -51,7 +51,7 @@ router.put(
     params: InvoiceValidation.idParam,
     body: InvoiceValidation.updateInvoice,
   }),
-  InvoiceController.updateInvoice
+  InvoiceController.updateInvoice,
 );
 
 router.patch(
@@ -62,14 +62,14 @@ router.patch(
     params: InvoiceValidation.idParam,
     body: InvoiceValidation.updateInvoice,
   }),
-  InvoiceController.updateInvoice
+  InvoiceController.updateInvoice,
 );
 
 router.delete(
   "/:id",
   validateRole(INVOICE_ROLE.ADMIN),
   validateRequest({ params: InvoiceValidation.idParam }),
-  InvoiceController.deleteInvoice
+  InvoiceController.deleteInvoice,
 );
 
 export const InvoiceRoutes = router;

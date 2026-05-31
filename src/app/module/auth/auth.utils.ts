@@ -46,7 +46,7 @@ export const buildAuthHeaders = (req: Request): Headers => {
 
 export const forwardAuthCookies = (
   authHeadersOrResponse: Headers | globalThis.Response,
-  res: Response
+  res: Response,
 ): void => {
   const headers =
     authHeadersOrResponse instanceof Headers
@@ -74,9 +74,13 @@ export const throwBetterAuthError = (error: unknown): never => {
   if (isAPIError(error)) {
     const apiError = error as BetterAuthErrorShape;
 
-    const statusCode = apiError.statusCode || apiError.status || status.BAD_REQUEST;
+    const statusCode =
+      apiError.statusCode || apiError.status || status.BAD_REQUEST;
 
-    const message = apiError.body?.message || apiError.message || "Authentication request failed";
+    const message =
+      apiError.body?.message ||
+      apiError.message ||
+      "Authentication request failed";
 
     throw new AppError(Number(statusCode), message);
   }

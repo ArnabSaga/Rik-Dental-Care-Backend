@@ -12,21 +12,29 @@ cloudinary.config({
 
 export const uploadBufferToCloudinary = (
   buffer: Buffer,
-  options: UploadApiOptions = {}
-): Promise<{ secure_url: string; public_id: string; bytes: number; resource_type: string }> => {
+  options: UploadApiOptions = {},
+): Promise<{
+  secure_url: string;
+  public_id: string;
+  bytes: number;
+  resource_type: string;
+}> => {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
-      if (error || !result) {
-        return reject(error ?? new Error("Cloudinary upload failed"));
-      }
+    const stream = cloudinary.uploader.upload_stream(
+      options,
+      (error, result) => {
+        if (error || !result) {
+          return reject(error ?? new Error("Cloudinary upload failed"));
+        }
 
-      resolve({
-        secure_url: result.secure_url,
-        public_id: result.public_id,
-        bytes: result.bytes,
-        resource_type: result.resource_type,
-      });
-    });
+        resolve({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+          bytes: result.bytes,
+          resource_type: result.resource_type,
+        });
+      },
+    );
 
     stream.end(buffer);
   });

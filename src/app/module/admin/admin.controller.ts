@@ -30,7 +30,9 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAppointments = catchAsync(async (req: Request, res: Response) => {
-  const result = await AdminService.getAppointments(req.query as IAdminAppointmentQuery);
+  const result = await AdminService.getAppointments(
+    req.query as IAdminAppointmentQuery,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,

@@ -11,25 +11,25 @@ router.use(requireAuth);
 router.get(
   "/",
   validateRequest({ query: AppointmentValidation.getAppointmentsQuery }),
-  AppointmentController.getAppointments
+  AppointmentController.getAppointments,
 );
 
 router.post(
   "/",
   validateRequest({ body: AppointmentValidation.bookRegularAppointment }),
-  AppointmentController.bookRegularAppointment
+  AppointmentController.bookRegularAppointment,
 );
 
 router.post(
   "/emergency",
   validateRequest({ body: AppointmentValidation.bookEmergencyAppointment }),
-  AppointmentController.bookEmergencyAppointment
+  AppointmentController.bookEmergencyAppointment,
 );
 
 router.get(
   "/:id",
   validateRequest({ params: AppointmentValidation.idParam }),
-  AppointmentController.getAppointmentById
+  AppointmentController.getAppointmentById,
 );
 
 router.put(
@@ -38,7 +38,7 @@ router.put(
     params: AppointmentValidation.idParam,
     body: AppointmentValidation.updateAppointment,
   }),
-  AppointmentController.updateAppointment
+  AppointmentController.updateAppointment,
 );
 
 router.patch(
@@ -47,13 +47,13 @@ router.patch(
     params: AppointmentValidation.idParam,
     body: AppointmentValidation.updateAppointment,
   }),
-  AppointmentController.updateAppointment
+  AppointmentController.updateAppointment,
 );
 
 router.delete(
   "/:id",
   validateRequest({ params: AppointmentValidation.idParam }),
-  AppointmentController.deleteAppointment
+  AppointmentController.deleteAppointment,
 );
 
 export const AppointmentRoutes = router;

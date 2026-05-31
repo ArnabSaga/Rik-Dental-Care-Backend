@@ -12,23 +12,31 @@ router.use(requireAuth);
 // Current logged-in user routes
 router.get("/me", UserController.getMe);
 
-router.put("/me", validateRequest({ body: UserValidation.updateMe }), UserController.updateMe);
+router.put(
+  "/me",
+  validateRequest({ body: UserValidation.updateMe }),
+  UserController.updateMe,
+);
 
-router.patch("/me", validateRequest({ body: UserValidation.updateMe }), UserController.updateMe);
+router.patch(
+  "/me",
+  validateRequest({ body: UserValidation.updateMe }),
+  UserController.updateMe,
+);
 
 // Admin routes
 router.get(
   "/",
   roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({ query: UserValidation.getAllUsersQuery }),
-  UserController.getAllUsers
+  UserController.getAllUsers,
 );
 
 router.get(
   "/:id",
   roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({ params: UserValidation.idParam }),
-  UserController.getUserById
+  UserController.getUserById,
 );
 
 router.put(
@@ -38,7 +46,7 @@ router.put(
     params: UserValidation.idParam,
     body: UserValidation.updateByAdmin,
   }),
-  UserController.updateUserByAdmin
+  UserController.updateUserByAdmin,
 );
 
 router.patch(
@@ -48,14 +56,14 @@ router.patch(
     params: UserValidation.idParam,
     body: UserValidation.updateByAdmin,
   }),
-  UserController.updateUserByAdmin
+  UserController.updateUserByAdmin,
 );
 
 router.delete(
   "/:id",
   roleMiddleware(USER_ROLE.ADMIN),
   validateRequest({ params: UserValidation.idParam }),
-  UserController.deleteUserByAdmin
+  UserController.deleteUserByAdmin,
 );
 
 export const UserRoutes = router;

@@ -46,7 +46,9 @@ const getConversationsQuery = z.object({
 
   patientId: z.string().trim().optional(),
 
-  type: z.enum(["PATIENT_SUPPORT", "AI_ASSISTANT", "APPOINTMENT_RELATED"]).optional(),
+  type: z
+    .enum(["PATIENT_SUPPORT", "AI_ASSISTANT", "APPOINTMENT_RELATED"])
+    .optional(),
 
   page: z.union([z.string(), z.number()]).optional(),
 

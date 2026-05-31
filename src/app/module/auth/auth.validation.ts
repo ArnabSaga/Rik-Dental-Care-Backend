@@ -16,8 +16,6 @@ const register = z.object({
 
   password: passwordSchema,
 
-  role: z.enum(["PATIENT", "MANAGER", "ADMIN"]).optional().default("PATIENT"),
-
   phone: z.string().trim().min(5).max(20).optional(),
 });
 

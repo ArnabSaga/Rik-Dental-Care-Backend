@@ -99,40 +99,56 @@ const ensurePatientProfileCompleted = async (patientId: string) => {
   ) {
     throw new AppError(
       status.BAD_REQUEST,
-      "Please complete patient profile before booking an appointment"
+      "Please complete patient profile before booking an appointment",
     );
   }
 };
 
 const resolvePatientIdForBooking = async (
   payloadPatientId: string | undefined,
-  authUser: User
+  authUser: User,
 ): Promise<string> => {
   if (authUser.role === APPOINTMENT_ROLE.PATIENT) {
     if (payloadPatientId && payloadPatientId !== authUser.id) {
-      throw new AppError(status.FORBIDDEN, "Patient can only book own appointment");
+      throw new AppError(
+        status.FORBIDDEN,
+        "Patient can only book own appointment",
+      );
     }
 
     return authUser.id;
   }
 
-  if (authUser.role === APPOINTMENT_ROLE.ADMIN || authUser.role === APPOINTMENT_ROLE.MANAGER) {
+  if (
+    authUser.role === APPOINTMENT_ROLE.ADMIN ||
+    authUser.role === APPOINTMENT_ROLE.MANAGER
+  ) {
     if (!payloadPatientId) {
-      throw new AppError(status.BAD_REQUEST, "patientId is required for admin/manager booking");
+      throw new AppError(
+        status.BAD_REQUEST,
+        "patientId is required for admin/manager booking",
+      );
     }
 
     return payloadPatientId;
   }
 
-  throw new AppError(status.FORBIDDEN, "You are not allowed to book appointment");
+  throw new AppError(
+    status.FORBIDDEN,
+    "You are not allowed to book appointment",
+  );
 };
 
-const prepareAppointmentServices = async (services?: IAppointmentServicePayload[]) => {
+const prepareAppointmentServices = async (
+  services?: IAppointmentServicePayload[],
+) => {
   if (!services || services.length === 0) {
     return [];
   }
 
-  const uniqueServiceIds = [...new Set(services.map((service) => service.serviceId))];
+  const uniqueServiceIds = [
+    ...new Set(services.map((service) => service.serviceId)),
+  ];
 
   const dentalServices = await prisma.dentalService.findMany({
     where: {
@@ -149,10 +165,15 @@ const prepareAppointmentServices = async (services?: IAppointmentServicePayload[
   });
 
   if (dentalServices.length !== uniqueServiceIds.length) {
-    throw new AppError(status.BAD_REQUEST, "One or more dental services are invalid or inactive");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "One or more dental services are invalid or inactive",
+    );
   }
 
-  const servicePriceMap = new Map(dentalServices.map((service) => [service.id, service.basePrice]));
+  const servicePriceMap = new Map(
+    dentalServices.map((service) => [service.id, service.basePrice]),
+  );
 
   return services.map((service) => ({
     serviceId: service.serviceId,
@@ -165,7 +186,7 @@ const prepareAppointmentServices = async (services?: IAppointmentServicePayload[
 const checkAppointmentConflict = async (
   treatedById: string,
   scheduledAt: Date,
-  excludeAppointmentId?: string
+  excludeAppointmentId?: string,
 ) => {
   const { start, end } = getSlotRange(scheduledAt);
 
@@ -202,12 +223,15 @@ const checkAppointmentConflict = async (
   if (conflict) {
     throw new AppError(
       status.CONFLICT,
-      `Doctor already has an appointment around ${conflict.scheduledAt.toISOString()}`
+      `Doctor already has an appointment around ${conflict.scheduledAt.toISOString()}`,
     );
   }
 };
 
-const ensureAppointmentAccess = async (appointmentId: string, authUser: User) => {
+const ensureAppointmentAccess = async (
+  appointmentId: string,
+  authUser: User,
+) => {
   const appointment = await prisma.appointment.findFirst({
     where: {
       id: appointmentId,
@@ -226,7 +250,10 @@ const ensureAppointmentAccess = async (appointmentId: string, authUser: User) =>
     appointment.patientId === authUser.id;
 
   if (!canAccess) {
-    throw new AppError(status.FORBIDDEN, "You are not allowed to access this appointment");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not allowed to access this appointment",
+    );
   }
 
   return appointment;
@@ -274,8 +301,14 @@ const getAppointments = async (query: IAppointmentQuery, authUser: User) => {
   return result;
 };
 
-const bookRegularAppointment = async (payload: IBookRegularAppointmentPayload, authUser: User) => {
-  const patientId = await resolvePatientIdForBooking(payload.patientId, authUser);
+const bookRegularAppointment = async (
+  payload: IBookRegularAppointmentPayload,
+  authUser: User,
+) => {
+  const patientId = await resolvePatientIdForBooking(
+    payload.patientId,
+    authUser,
+  );
 
   const scheduledAt = normalizeDateTime(payload.scheduledAt);
 
@@ -286,7 +319,9 @@ const bookRegularAppointment = async (payload: IBookRegularAppointmentPayload, a
   await ensureDoctorExists(payload.doctorId);
   await checkAppointmentConflict(payload.doctorId, scheduledAt);
 
-  const appointmentServices = await prepareAppointmentServices(payload.services);
+  const appointmentServices = await prepareAppointmentServices(
+    payload.services,
+  );
   const appointmentNo = await generateAppointmentNo();
 
   const appointment = await prisma.appointment.create({
@@ -317,11 +352,16 @@ const bookRegularAppointment = async (payload: IBookRegularAppointmentPayload, a
 
 const bookEmergencyAppointment = async (
   payload: IBookEmergencyAppointmentPayload,
-  authUser: User
+  authUser: User,
 ) => {
-  const patientId = await resolvePatientIdForBooking(payload.patientId, authUser);
+  const patientId = await resolvePatientIdForBooking(
+    payload.patientId,
+    authUser,
+  );
 
-  const scheduledAt = payload.scheduledAt ? normalizeDateTime(payload.scheduledAt) : new Date();
+  const scheduledAt = payload.scheduledAt
+    ? normalizeDateTime(payload.scheduledAt)
+    : new Date();
 
   await ensurePatientExists(patientId);
   await ensureDoctorExists(payload.doctorId);
@@ -330,7 +370,9 @@ const bookEmergencyAppointment = async (
     await checkAppointmentConflict(payload.doctorId, scheduledAt);
   }
 
-  const appointmentServices = await prepareAppointmentServices(payload.services);
+  const appointmentServices = await prepareAppointmentServices(
+    payload.services,
+  );
   const appointmentNo = await generateAppointmentNo();
 
   const appointment = await prisma.appointment.create({
@@ -366,17 +408,26 @@ const getAppointmentById = async (appointmentId: string, authUser: User) => {
 const updateAppointment = async (
   appointmentId: string,
   payload: IUpdateAppointmentPayload,
-  authUser: User
+  authUser: User,
 ) => {
-  const existingAppointment = await ensureAppointmentAccess(appointmentId, authUser);
+  const existingAppointment = await ensureAppointmentAccess(
+    appointmentId,
+    authUser,
+  );
 
   if (authUser.role === APPOINTMENT_ROLE.PATIENT) {
     if (payload.status && payload.status !== APPOINTMENT_STATUS.CANCELLED) {
-      throw new AppError(status.FORBIDDEN, "Patient can only cancel own appointment");
+      throw new AppError(
+        status.FORBIDDEN,
+        "Patient can only cancel own appointment",
+      );
     }
 
     if (payload.doctorId || payload.priority) {
-      throw new AppError(status.FORBIDDEN, "Patient is not allowed to update doctor or priority");
+      throw new AppError(
+        status.FORBIDDEN,
+        "Patient is not allowed to update doctor or priority",
+      );
     }
   }
 
@@ -387,19 +438,36 @@ const updateAppointment = async (
     : existingAppointment.scheduledAt;
 
   if (payload.scheduledAt) {
-    ensureFutureDate(nextScheduledAt, "Rescheduled appointment time must be in the future");
+    ensureFutureDate(
+      nextScheduledAt,
+      "Rescheduled appointment time must be in the future",
+    );
 
     if (!nextDoctorId) {
-      throw new AppError(status.BAD_REQUEST, "Doctor is required for rescheduling");
+      throw new AppError(
+        status.BAD_REQUEST,
+        "Doctor is required for rescheduling",
+      );
     }
 
     await ensureDoctorExists(nextDoctorId);
-    await checkAppointmentConflict(nextDoctorId, nextScheduledAt, existingAppointment.id);
+    await checkAppointmentConflict(
+      nextDoctorId,
+      nextScheduledAt,
+      existingAppointment.id,
+    );
   }
 
-  if (payload.doctorId && payload.doctorId !== existingAppointment.treatedById) {
+  if (
+    payload.doctorId &&
+    payload.doctorId !== existingAppointment.treatedById
+  ) {
     await ensureDoctorExists(payload.doctorId);
-    await checkAppointmentConflict(payload.doctorId, nextScheduledAt, existingAppointment.id);
+    await checkAppointmentConflict(
+      payload.doctorId,
+      nextScheduledAt,
+      existingAppointment.id,
+    );
   }
 
   const isCancelRequest = payload.status === APPOINTMENT_STATUS.CANCELLED;
@@ -436,10 +504,16 @@ const updateAppointment = async (
 };
 
 const deleteAppointment = async (appointmentId: string, authUser: User) => {
-  const existingAppointment = await ensureAppointmentAccess(appointmentId, authUser);
+  const existingAppointment = await ensureAppointmentAccess(
+    appointmentId,
+    authUser,
+  );
 
   if (existingAppointment.status === APPOINTMENT_STATUS.COMPLETED) {
-    throw new AppError(status.BAD_REQUEST, "Completed appointment cannot be cancelled");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Completed appointment cannot be cancelled",
+    );
   }
 
   const updatedAppointment = await prisma.appointment.update({

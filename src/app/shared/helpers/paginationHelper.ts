@@ -4,7 +4,11 @@ import {
   TPaginationResult,
 } from "../types/pagination.types";
 
-const toPositiveNumber = (value: unknown, fallback: number, max?: number): number => {
+const toPositiveNumber = (
+  value: unknown,
+  fallback: number,
+  max?: number,
+): number => {
   const parsed = Number(value);
 
   if (!Number.isFinite(parsed) || parsed < 1) {
@@ -18,7 +22,7 @@ const toPositiveNumber = (value: unknown, fallback: number, max?: number): numbe
 
 const calculatePagination = (
   options: TPaginationOptions = {},
-  config: TPaginationConfig = {}
+  config: TPaginationConfig = {},
 ): TPaginationResult => {
   const defaultPage = config.defaultPage ?? 1;
   const defaultLimit = config.defaultLimit ?? 10;

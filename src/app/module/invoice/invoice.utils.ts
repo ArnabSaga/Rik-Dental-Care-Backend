@@ -29,7 +29,11 @@ export const ATTACHMENT_TYPE = {
 
 export const invoiceSearchableFields = ["invoiceNo", "pdfUrl"];
 
-export const invoiceFilterableFields = ["appointmentId", "issuedById", "status"];
+export const invoiceFilterableFields = [
+  "appointmentId",
+  "issuedById",
+  "status",
+];
 
 export const invoiceSortableFields = [
   "invoiceNo",
@@ -170,7 +174,9 @@ export const getParamId = (id: string | string[] | undefined): string => {
   return id;
 };
 
-export const normalizeDate = (value?: string | Date | null): Date | null | undefined => {
+export const normalizeDate = (
+  value?: string | Date | null,
+): Date | null | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return null;
 
@@ -188,7 +194,7 @@ export const toDecimal = (value: number | string | Prisma.Decimal) => {
 };
 
 export const decimalToNumber = (
-  value: number | string | Prisma.Decimal | null | undefined
+  value: number | string | Prisma.Decimal | null | undefined,
 ): number => {
   if (value === null || value === undefined) return 0;
   return Number(value);
@@ -197,12 +203,15 @@ export const decimalToNumber = (
 export const calculateLineTotal = (
   quantity: number,
   unitPrice: number,
-  discountAmount = 0
+  discountAmount = 0,
 ): number => {
   const total = quantity * unitPrice - discountAmount;
 
   if (total < 0) {
-    throw new AppError(status.BAD_REQUEST, "Invoice item total cannot be negative");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Invoice item total cannot be negative",
+    );
   }
 
   return Number(total.toFixed(2));
@@ -233,7 +242,10 @@ export const calculateInvoiceTotals = (input: {
   }
 
   if (paidAmount > totalAmount) {
-    throw new AppError(status.BAD_REQUEST, "Paid amount cannot be greater than total amount");
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Paid amount cannot be greater than total amount",
+    );
   }
 
   const dueAmount = totalAmount - paidAmount;
@@ -279,7 +291,7 @@ export const resolveInvoiceStatus = (input: {
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 
@@ -313,7 +325,7 @@ export const generateInvoiceNo = async (): Promise<string> => {
 };
 
 export const getAttachmentTypeFromMime = (
-  mimeType?: string
+  mimeType?: string,
 ): "IMAGE" | "PDF" | "DOCUMENT" | "OTHER" => {
   if (!mimeType) return ATTACHMENT_TYPE.OTHER;
 
@@ -336,7 +348,9 @@ export const getAttachmentTypeFromMime = (
   return ATTACHMENT_TYPE.OTHER;
 };
 
-export const getUploadedFileUrl = (file?: Express.Multer.File): string | undefined => {
+export const getUploadedFileUrl = (
+  file?: Express.Multer.File,
+): string | undefined => {
   if (!file) return undefined;
 
   const possibleFile = file as Express.Multer.File & {
@@ -348,7 +362,9 @@ export const getUploadedFileUrl = (file?: Express.Multer.File): string | undefin
   return possibleFile.path || possibleFile.secure_url || possibleFile.url;
 };
 
-export const getUploadedFilePublicId = (file?: Express.Multer.File): string | undefined => {
+export const getUploadedFilePublicId = (
+  file?: Express.Multer.File,
+): string | undefined => {
   if (!file) return undefined;
 
   const possibleFile = file as Express.Multer.File & {

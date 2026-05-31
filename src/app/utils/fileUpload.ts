@@ -6,7 +6,9 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
   if (FILE_UPLOAD.ALLOWED_MIME_TYPES.includes(file.mimetype as any)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only JPG, PNG, PDF, and DOCX are allowed."));
+    cb(
+      new Error("Invalid file type. Only JPG, PNG, PDF, and DOCX are allowed."),
+    );
   }
 };
 

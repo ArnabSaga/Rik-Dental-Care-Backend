@@ -21,7 +21,14 @@ const createNotification = z
       .max(1000, "Message must not exceed 1000 characters"),
 
     type: z
-      .enum(["APPOINTMENT", "EMERGENCY", "REMINDER", "PRESCRIPTION", "INVOICE", "SYSTEM"])
+      .enum([
+        "APPOINTMENT",
+        "EMERGENCY",
+        "REMINDER",
+        "PRESCRIPTION",
+        "INVOICE",
+        "SYSTEM",
+      ])
       .optional()
       .default("SYSTEM"),
 
@@ -57,7 +64,14 @@ const getNotificationsQuery = z.object({
   recipientId: z.string().trim().optional(),
 
   type: z
-    .enum(["APPOINTMENT", "EMERGENCY", "REMINDER", "PRESCRIPTION", "INVOICE", "SYSTEM"])
+    .enum([
+      "APPOINTMENT",
+      "EMERGENCY",
+      "REMINDER",
+      "PRESCRIPTION",
+      "INVOICE",
+      "SYSTEM",
+    ])
     .optional(),
 
   entityType: z
@@ -74,7 +88,9 @@ const getNotificationsQuery = z.object({
 
   entityId: z.string().trim().optional(),
 
-  isRead: z.union([z.boolean(), z.enum(["true", "false", "1", "0"])]).optional(),
+  isRead: z
+    .union([z.boolean(), z.enum(["true", "false", "1", "0"])])
+    .optional(),
 
   createdAtFrom: z.string().trim().optional(),
 
@@ -84,7 +100,9 @@ const getNotificationsQuery = z.object({
 
   limit: z.union([z.string(), z.number()]).optional(),
 
-  sortBy: z.enum(["createdAt", "updatedAt", "readAt", "type", "isRead"]).optional(),
+  sortBy: z
+    .enum(["createdAt", "updatedAt", "readAt", "type", "isRead"])
+    .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),
 

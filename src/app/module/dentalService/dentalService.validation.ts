@@ -79,13 +79,17 @@ const updateDentalServiceStatus = z
 const getAllDentalServicesQuery = z.object({
   searchTerm: z.string().trim().optional(),
 
-  isActive: z.union([z.boolean(), z.enum(["true", "false", "1", "0"])]).optional(),
+  isActive: z
+    .union([z.boolean(), z.enum(["true", "false", "1", "0"])])
+    .optional(),
 
   page: z.union([z.string(), z.number()]).optional(),
 
   limit: z.union([z.string(), z.number()]).optional(),
 
-  sortBy: z.enum(["name", "basePrice", "isActive", "createdAt", "updatedAt"]).optional(),
+  sortBy: z
+    .enum(["name", "basePrice", "isActive", "createdAt", "updatedAt"])
+    .optional(),
 
   sortOrder: z.enum(["asc", "desc"]).optional(),
 

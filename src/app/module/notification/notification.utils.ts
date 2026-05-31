@@ -37,7 +37,13 @@ export const notificationFilterableFields = [
   "isRead",
 ];
 
-export const notificationSortableFields = ["createdAt", "updatedAt", "readAt", "type", "isRead"];
+export const notificationSortableFields = [
+  "createdAt",
+  "updatedAt",
+  "readAt",
+  "type",
+  "isRead",
+];
 
 export const notificationSelectableFields = [
   "id",
@@ -110,7 +116,7 @@ export const getNotificationDateRangeWhere = (query: {
 };
 
 export const removeUndefinedFields = <T extends Record<string, unknown>>(
-  payload: T
+  payload: T,
 ): Partial<T> => {
   const cleanPayload: Partial<T> = {};
 

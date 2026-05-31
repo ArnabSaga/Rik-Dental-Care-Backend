@@ -2,7 +2,9 @@ import { toNodeHandler } from "better-auth/node";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
+import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import { envVars } from "./app/config/env";
 import { auth } from "./app/lib/auth";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
@@ -11,8 +13,30 @@ import router from "./app/router";
 
 const app: Application = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const getViewsDir = () => {
+  const candidates = [
+    path.resolve(__dirname, "app", "templates"),
+    path.resolve(__dirname, "..", "templates"),
+    path.resolve(process.cwd(), "src", "app", "templates"),
+    path.resolve(process.cwd(), "dist", "app", "templates"),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return candidates[0];
+};
+
 app.set("view engine", "ejs");
-app.set("views", path.resolve(process.cwd(), `src/app/templates/`));
+app.set("views", getViewsDir());
+
+//* Better Auth — must be mounted BEFORE body parsers so it can read the raw stream
+app.use("/api/auth", toNodeHandler(auth));
 
 //* parsers
 app.use(express.json());
@@ -21,7 +45,9 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   envVars.FRONTEND_URL,
-  ...(envVars.NODE_ENV === "development" ? ["http://localhost:3000", "http://127.0.0.1:3000"] : []),
+  ...(envVars.NODE_ENV === "development"
+    ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+    : []),
 ]
   .filter(Boolean)
   .map((origin) => origin.replace(/\/$/, ""));
@@ -42,11 +68,8 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
     exposedHeaders: ["Content-Type", "Set-Cookie"],
-  })
+  }),
 );
-
-//* application auth routes
-app.use("/api/auth", toNodeHandler(auth));
 
 //* application routes
 app.use("/api/v1", router);
@@ -56,10 +79,10 @@ app.get("/", (_req: Request, res: Response) => {
   res.send("Hello from Rik Dentail Care");
 });
 
+//! not found route (must come before globalErrorHandler)
+app.use(notFound);
+
 //! global error handler
 app.use(globalErrorHandler);
-
-//! not found route
-app.use(notFound);
 
 export default app;

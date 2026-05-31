@@ -7,7 +7,10 @@ import { ChatService } from "./chat.service";
 import { getParamId } from "./chat.utils";
 
 const getConversations = catchAsync(async (req: Request, res: Response) => {
-  const result = await ChatService.getConversations(req.query as IConversationQuery, req.user!);
+  const result = await ChatService.getConversations(
+    req.query as IConversationQuery,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -32,7 +35,10 @@ const createConversation = catchAsync(async (req: Request, res: Response) => {
 const getConversationById = catchAsync(async (req: Request, res: Response) => {
   const conversationId = getParamId(req.params.id);
 
-  const result = await ChatService.getConversationById(conversationId, req.user!);
+  const result = await ChatService.getConversationById(
+    conversationId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -45,7 +51,10 @@ const getConversationById = catchAsync(async (req: Request, res: Response) => {
 const deleteConversation = catchAsync(async (req: Request, res: Response) => {
   const conversationId = getParamId(req.params.id);
 
-  const result = await ChatService.deleteConversation(conversationId, req.user!);
+  const result = await ChatService.deleteConversation(
+    conversationId,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -61,7 +70,7 @@ const getMessages = catchAsync(async (req: Request, res: Response) => {
   const result = await ChatService.getMessages(
     conversationId,
     req.query as IMessageQuery,
-    req.user!
+    req.user!,
   );
 
   sendResponse(res, {
@@ -76,7 +85,11 @@ const getMessages = catchAsync(async (req: Request, res: Response) => {
 const sendMessage = catchAsync(async (req: Request, res: Response) => {
   const conversationId = getParamId(req.params.id);
 
-  const result = await ChatService.sendMessage(conversationId, req.body, req.user!);
+  const result = await ChatService.sendMessage(
+    conversationId,
+    req.body,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.CREATED,

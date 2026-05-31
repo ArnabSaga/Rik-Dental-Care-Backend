@@ -22,7 +22,9 @@ const normalizeUrl = (url: string) => url.replace(/\/$/, "");
 
 const trustedOrigins = [
   envVars.FRONTEND_URL,
-  ...(envVars.NODE_ENV === "development" ? ["http://localhost:3000", "http://127.0.0.1:3000"] : []),
+  ...(envVars.NODE_ENV === "development"
+    ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+    : []),
 ]
   .filter(Boolean)
   .map((origin) => normalizeUrl(origin));
@@ -128,7 +130,9 @@ export const auth = betterAuth({
       async sendVerificationOTP({ email, otp, type }) {
         const normalizedEmail = email.trim().toLowerCase();
 
-        console.log(`[AUTH][OTP] callback hit | type=${type} | email=${normalizedEmail}`);
+        console.log(
+          `[AUTH][OTP] callback hit | type=${type} | email=${normalizedEmail}`,
+        );
 
         try {
           const user = await prisma.user.findFirst({
@@ -147,12 +151,16 @@ export const auth = betterAuth({
           });
 
           if (user?.isDeleted) {
-            console.warn(`[AUTH][OTP] skipped deleted user: ${normalizedEmail}`);
+            console.warn(
+              `[AUTH][OTP] skipped deleted user: ${normalizedEmail}`,
+            );
             return;
           }
 
           if (user && !user.isActive) {
-            console.warn(`[AUTH][OTP] skipped inactive user: ${normalizedEmail}`);
+            console.warn(
+              `[AUTH][OTP] skipped inactive user: ${normalizedEmail}`,
+            );
             return;
           }
 
@@ -164,7 +172,9 @@ export const auth = betterAuth({
               subject: "Verify your email with Rik Dental Care",
             });
 
-            console.log(`[AUTH][OTP] verification OTP email sent to ${normalizedEmail}`);
+            console.log(
+              `[AUTH][OTP] verification OTP email sent to ${normalizedEmail}`,
+            );
             return;
           }
 
@@ -176,7 +186,9 @@ export const auth = betterAuth({
               subject: "Password Reset OTP",
             });
 
-            console.log(`[AUTH][OTP] password reset OTP email sent to ${normalizedEmail}`);
+            console.log(
+              `[AUTH][OTP] password reset OTP email sent to ${normalizedEmail}`,
+            );
             return;
           }
 

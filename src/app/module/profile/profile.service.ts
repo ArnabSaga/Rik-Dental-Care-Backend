@@ -146,11 +146,17 @@ const getMyProfile = async (userId: string) => {
   throw new AppError(status.BAD_REQUEST, "Invalid user role");
 };
 
-const upsertMyPatientProfile = async (userId: string, payload: IUpdatePatientProfilePayload) => {
+const upsertMyPatientProfile = async (
+  userId: string,
+  payload: IUpdatePatientProfilePayload,
+) => {
   const user = await ensureActiveUser(userId);
 
   if (user.role !== PROFILE_ROLE.PATIENT) {
-    throw new AppError(status.FORBIDDEN, "Only patients can update patient profile information");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only patients can update patient profile information",
+    );
   }
 
   const cleanPayload = removeUndefinedFields({
@@ -187,16 +193,22 @@ const upsertMyPatientProfile = async (userId: string, payload: IUpdatePatientPro
     age: calculateAge(profile.dateOfBirth),
     completion: buildProfileCompletionStatus(
       PROFILE_ROLE.PATIENT,
-      isPatientProfileCompleted(profile)
+      isPatientProfileCompleted(profile),
     ),
   };
 };
 
-const upsertMyDoctorProfile = async (userId: string, payload: IUpdateDoctorProfilePayload) => {
+const upsertMyDoctorProfile = async (
+  userId: string,
+  payload: IUpdateDoctorProfilePayload,
+) => {
   const user = await ensureActiveUser(userId);
 
   if (user.role !== PROFILE_ROLE.ADMIN) {
-    throw new AppError(status.FORBIDDEN, "Only doctor/admin can update doctor profile");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only doctor/admin can update doctor profile",
+    );
   }
 
   const cleanPayload = removeUndefinedFields({
@@ -227,11 +239,17 @@ const upsertMyDoctorProfile = async (userId: string, payload: IUpdateDoctorProfi
   });
 };
 
-const upsertMyManagerProfile = async (userId: string, payload: IUpdateManagerProfilePayload) => {
+const upsertMyManagerProfile = async (
+  userId: string,
+  payload: IUpdateManagerProfilePayload,
+) => {
   const user = await ensureActiveUser(userId);
 
   if (user.role !== PROFILE_ROLE.MANAGER) {
-    throw new AppError(status.FORBIDDEN, "Only managers can update manager profile");
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only managers can update manager profile",
+    );
   }
 
   const cleanPayload = removeUndefinedFields({
@@ -259,7 +277,9 @@ const upsertMyManagerProfile = async (userId: string, payload: IUpdateManagerPro
   });
 };
 
-const buildPatientProfileWhere = (query: IPatientProfileQuery): Prisma.PatientProfileWhereInput => {
+const buildPatientProfileWhere = (
+  query: IPatientProfileQuery,
+): Prisma.PatientProfileWhereInput => {
   const where: Prisma.PatientProfileWhereInput = {
     isDeleted: false,
     user: {

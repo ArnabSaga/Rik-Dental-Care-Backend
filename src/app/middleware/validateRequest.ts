@@ -15,12 +15,14 @@ export const validateRequest =
       }
 
       if (options.query) {
-        req.query = (await options.query.parseAsync(req.query)) as Request["query"];
+        req.query = (await options.query.parseAsync(
+          req.query,
+        )) as Request["query"];
       }
 
       if (options.params) {
         req.params = (await options.params.parseAsync(
-          req.params
+          req.params,
         )) as Request["params"];
       }
 

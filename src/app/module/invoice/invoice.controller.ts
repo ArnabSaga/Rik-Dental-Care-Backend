@@ -7,7 +7,10 @@ import { InvoiceService } from "./invoice.service";
 import { getParamId } from "./invoice.utils";
 
 const getInvoices = catchAsync(async (req: Request, res: Response) => {
-  const result = await InvoiceService.getInvoices(req.query as IInvoiceQuery, req.user!);
+  const result = await InvoiceService.getInvoices(
+    req.query as IInvoiceQuery,
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -19,7 +22,11 @@ const getInvoices = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createInvoice = catchAsync(async (req: Request, res: Response) => {
-  const result = await InvoiceService.createInvoice(req.body, req.user!, req.file);
+  const result = await InvoiceService.createInvoice(
+    req.body,
+    req.user!,
+    req.file,
+  );
 
   sendResponse(res, {
     statusCode: status.CREATED,
@@ -45,7 +52,12 @@ const getInvoiceById = catchAsync(async (req: Request, res: Response) => {
 const updateInvoice = catchAsync(async (req: Request, res: Response) => {
   const invoiceId = getParamId(req.params.id);
 
-  const result = await InvoiceService.updateInvoice(invoiceId, req.body, req.user!, req.file);
+  const result = await InvoiceService.updateInvoice(
+    invoiceId,
+    req.body,
+    req.user!,
+    req.file,
+  );
 
   sendResponse(res, {
     statusCode: status.OK,
@@ -71,7 +83,10 @@ const deleteInvoice = catchAsync(async (req: Request, res: Response) => {
 const renderInvoice = catchAsync(async (req: Request, res: Response) => {
   const invoiceId = getParamId(req.params.id);
 
-  const invoice = await InvoiceService.getInvoiceForTemplate(invoiceId, req.user!);
+  const invoice = await InvoiceService.getInvoiceForTemplate(
+    invoiceId,
+    req.user!,
+  );
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
 
@@ -83,10 +98,16 @@ const renderInvoice = catchAsync(async (req: Request, res: Response) => {
 const downloadInvoice = catchAsync(async (req: Request, res: Response) => {
   const invoiceId = getParamId(req.params.id);
 
-  const invoice = await InvoiceService.getInvoiceForTemplate(invoiceId, req.user!);
+  const invoice = await InvoiceService.getInvoiceForTemplate(
+    invoiceId,
+    req.user!,
+  );
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Content-Disposition", `attachment; filename="${invoice.invoiceNo}.html"`);
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${invoice.invoiceNo}.html"`,
+  );
 
   res.render("invoice", {
     invoice,
