@@ -1,0 +1,1066 @@
+{
+  "info": {
+    "title": "Rik Dental Care API",
+    "version": "1.0.0",
+    "description": "API documentation and schema details for the Rik Dental Care backend, using Better Auth for authentication and Prisma with Neon PostgreSQL.",
+    "baseUrl": "http://localhost:5000/api/v1",
+    "authUrl": "http://localhost:5000/api/auth",
+    "authCookieName": "rik_dental_care_session",
+    "fileUpload": {
+      "maxSizeBytes": 5242880,
+      "maxSizeMB": 5,
+      "allowedMimeTypes": [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ]
+    }
+  },
+  "enums": {
+    "Role": ["ADMIN", "PATIENT", "MANAGER"],
+    "Status": ["ACTIVE", "INACTIVE", "BLOCKED"],
+    "Gender": ["MALE", "FEMALE", "OTHER"],
+    "BloodGroup": ["APLUS", "AMINUS", "BPLUS", "BMINUS", "ABPLUS", "ABMINUS", "OPLUS", "OMINUS"],
+    "Priority": ["LOW", "NORMAL", "HIGH", "URGENT"],
+    "AppointmentType": ["REGULAR", "EMERGENCY"],
+    "AppointmentStatus": ["PENDING", "CONFIRMED", "RESCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW"],
+    "InvoiceStatus": ["DRAFT", "ISSUED", "PARTIALLY_PAID", "PAID", "OVERDUE", "CANCELLED", "REFUNDED"],
+    "PaymentStatus": ["PENDING", "COMPLETED", "FAILED", "REFUNDED", "CANCELLED"],
+    "PaymentMethod": ["CASH", "CARD", "BANK_TRANSFER", "BKASH", "NAGAD", "ROCKET"],
+    "NotificationType": ["APPOINTMENT", "EMERGENCY", "REMINDER", "PRESCRIPTION", "INVOICE", "SYSTEM"],
+    "EntityType": ["APPOINTMENT", "INVOICE", "PRESCRIPTION", "MEDICAL_HISTORY", "CLINICAL_NOTE", "TREATMENT_PLAN", "PAYMENT"],
+    "ChatSenderType": ["PATIENT", "ADMIN", "MANAGER", "AI"],
+    "ConversationType": ["PATIENT_SUPPORT", "AI_ASSISTANT", "APPOINTMENT_RELATED"],
+    "AttachmentType": ["IMAGE", "PDF", "DOCUMENT", "OTHER"],
+    "MedicalHistoryType": ["ALLERGY", "SURGERY", "DISEASE", "MEDICATION", "DENTAL_HISTORY", "OTHER"]
+  },
+  "endpoints": {
+    "auth": {
+      "description": "Authentication and user sign-up/login management. Most auth routes wrap Better Auth.",
+      "routes": [
+        {
+          "path": "/auth/register",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Register a new Patient user account.",
+          "body": {
+            "name": { "type": "string", "required": true, "min": 2, "max": 100 },
+            "email": { "type": "string (email)", "required": true },
+            "password": { "type": "string", "required": true, "min": 8, "max": 128 },
+            "phone": { "type": "string", "required": false, "min": 5, "max": 20 }
+          }
+        },
+        {
+          "path": "/auth/login",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Log in to user account. Returns user details and session object. Sets HTTP-only cookie rik_dental_care_session.",
+          "body": {
+            "email": { "type": "string (email)", "required": true },
+            "password": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/auth/logout",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Invalidates current session and clears auth cookies."
+        },
+        {
+          "path": "/auth/me",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Returns current logged in user account info and active session details."
+        },
+        {
+          "path": "/auth/forgot-password",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Requests an email verification OTP for password reset.",
+          "body": {
+            "email": { "type": "string (email)", "required": true }
+          }
+        },
+        {
+          "path": "/auth/reset-password",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Resets the user's password using the OTP sent to their email.",
+          "body": {
+            "email": { "type": "string (email)", "required": true },
+            "otp": { "type": "string (6-digits)", "required": true },
+            "password": { "type": "string", "required": true, "min": 8, "max": 128 }
+          }
+        },
+        {
+          "path": "/auth/change-password",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Change password for the currently logged-in user.",
+          "body": {
+            "currentPassword": { "type": "string", "required": true },
+            "newPassword": { "type": "string", "required": true, "min": 8, "max": 128 },
+            "revokeOtherSessions": { "type": "boolean", "required": false, "default": true }
+          }
+        },
+        {
+          "path": "/auth/verify-email",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Verifies a user's email using OTP code.",
+          "body": {
+            "email": { "type": "string (email)", "required": true },
+            "otp": { "type": "string (6-digits)", "required": true }
+          }
+        },
+        {
+          "path": "/auth/resend-verification",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Resends verification OTP to the user's email.",
+          "body": {
+            "email": { "type": "string (email)", "required": true }
+          }
+        },
+        {
+          "path": "/auth/google",
+          "method": "POST",
+          "authRequired": false,
+          "description": "Initiate Google OAuth authentication redirect.",
+          "body": {
+            "callbackURL": { "type": "string (url)", "required": false }
+          }
+        },
+        {
+          "path": "/auth/google/success",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Redirect endpoint called after successful Google OAuth authentication."
+        }
+      ]
+    },
+    "users": {
+      "description": "User profiles and account settings management.",
+      "routes": [
+        {
+          "path": "/users/me",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Retrieve current logged in user details."
+        },
+        {
+          "path": "/users/me",
+          "method": "PUT",
+          "authRequired": true,
+          "description": "Update current logged in user details (PUT / PATCH).",
+          "body": {
+            "name": { "type": "string", "required": false, "min": 2, "max": 100 },
+            "phone": { "type": "string", "required": false, "min": 5, "max": 20, "nullable": true },
+            "image": { "type": "string (url)", "required": false, "nullable": true }
+          }
+        },
+        {
+          "path": "/users",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Retrieve all users in the system (Admin only). Supports pagination, searching, sorting and filtering.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "role": { "type": "Role", "required": false },
+            "status": { "type": "Status", "required": false },
+            "isActive": { "type": "boolean | string", "required": false },
+            "emailVerified": { "type": "boolean | string", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false },
+            "sortBy": { "type": "string", "required": false, "allowedValues": ["name", "email", "role", "status", "createdAt", "updatedAt"] },
+            "sortOrder": { "type": "string", "required": false, "allowedValues": ["asc", "desc"] },
+            "fields": { "type": "string", "required": false, "description": "Comma separated fields to select" }
+          }
+        },
+        {
+          "path": "/users/:id",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Retrieve specific user by account ID (Admin only).",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/users/:id",
+          "method": "PUT",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Update user account properties by ID (Admin only) (PUT / PATCH).",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "name": { "type": "string", "required": false, "min": 2, "max": 100 },
+            "phone": { "type": "string", "required": false, "min": 5, "max": 20, "nullable": true },
+            "image": { "type": "string (url)", "required": false, "nullable": true },
+            "role": { "type": "Role", "required": false },
+            "status": { "type": "Status", "required": false },
+            "isActive": { "type": "boolean", "required": false },
+            "emailVerified": { "type": "boolean", "required": false }
+          }
+        },
+        {
+          "path": "/users/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Soft delete user by ID (Admin only).",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "profiles": {
+      "description": "Role-specific detailed profiles (Patients, Doctors/Admins, Managers).",
+      "routes": [
+        {
+          "path": "/profiles/me",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get current logged-in user profile, including patient/doctor/manager details."
+        },
+        {
+          "path": "/profiles/me/patient",
+          "method": "PUT",
+          "authRequired": true,
+          "allowedRoles": ["PATIENT"],
+          "description": "Create or update Patient specific profile metadata (PUT / PATCH).",
+          "body": {
+            "address": { "type": "string", "required": false, "max": 500, "nullable": true },
+            "emergencyContact": { "type": "string", "required": false, "min": 5, "max": 50, "nullable": true },
+            "dateOfBirth": { "type": "string (ISO datetime/date)", "required": false, "nullable": true },
+            "gender": { "type": "Gender", "required": false, "nullable": true },
+            "bloodGroup": { "type": "BloodGroup", "required": false, "nullable": true },
+            "allergy": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "medicalCondition": { "type": "string", "required": false, "max": 1000, "nullable": true }
+          }
+        },
+        {
+          "path": "/profiles/me/doctor",
+          "method": "PUT",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Create or update Doctor specific profile metadata (PUT / PATCH).",
+          "body": {
+            "bmdcNumber": { "type": "string", "required": false, "max": 100, "nullable": true },
+            "specialty": { "type": "string", "required": false, "max": 150, "nullable": true },
+            "designation": { "type": "string", "required": false, "max": 150, "nullable": true },
+            "bio": { "type": "string", "required": false, "max": 2000, "nullable": true },
+            "signatureUrl": { "type": "string (url)", "required": false, "nullable": true }
+          }
+        },
+        {
+          "path": "/profiles/me/manager",
+          "method": "PUT",
+          "authRequired": true,
+          "allowedRoles": ["MANAGER"],
+          "description": "Create or update Manager specific profile metadata (PUT / PATCH).",
+          "body": {
+            "designation": { "type": "string", "required": false, "max": 150, "nullable": true },
+            "phone": { "type": "string", "required": false, "min": 5, "max": 20, "nullable": true }
+          }
+        },
+        {
+          "path": "/profiles/patients",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN", "MANAGER"],
+          "description": "Retrieve all patient profiles (Admin/Manager only). Supports pagination, filter, sorting.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "gender": { "type": "Gender", "required": false },
+            "bloodGroup": { "type": "BloodGroup", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false },
+            "sortBy": { "type": "string", "required": false, "allowedValues": ["createdAt", "updatedAt", "dateOfBirth", "gender", "bloodGroup"] },
+            "sortOrder": { "type": "string", "required": false, "allowedValues": ["asc", "desc"] },
+            "fields": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/profiles/patients/:id",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN", "MANAGER"],
+          "description": "Retrieve specific patient profile by profile ID.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/profiles/patients/user/:userId",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN", "MANAGER"],
+          "description": "Retrieve patient profile by associated account User ID.",
+          "params": {
+            "userId": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "dentalServices": {
+      "description": "Catalog of dental care treatments, packages, and pricing.",
+      "routes": [
+        {
+          "path": "/dental-services/public",
+          "method": "GET",
+          "authRequired": false,
+          "description": "Fetch active services catalog for public website view. Supports filtering, pagination.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false },
+            "sortBy": { "type": "string", "required": false, "allowedValues": ["name", "basePrice", "isActive", "createdAt", "updatedAt"] },
+            "sortOrder": { "type": "string", "required": false, "allowedValues": ["asc", "desc"] },
+            "fields": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/dental-services/public/slug/:slug",
+          "method": "GET",
+          "authRequired": false,
+          "description": "Retrieve public service catalog details by slug.",
+          "params": {
+            "slug": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/dental-services/public/:id",
+          "method": "GET",
+          "authRequired": false,
+          "description": "Retrieve public service details by ID.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/dental-services",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN", "MANAGER"],
+          "description": "Retrieve all dental services (active/inactive) (Admin/Manager only). Supports query queries same as public list.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "isActive": { "type": "boolean | string", "required": false }
+          }
+        },
+        {
+          "path": "/dental-services",
+          "method": "POST",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Create a new dental service.",
+          "body": {
+            "name": { "type": "string", "required": true, "min": 2, "max": 150 },
+            "description": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "basePrice": { "type": "number", "required": true, "description": "Positive value" },
+            "slug": { "type": "string", "required": false, "min": 2, "max": 180 },
+            "isActive": { "type": "boolean", "required": false, "default": true }
+          }
+        },
+        {
+          "path": "/dental-services/:id",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN", "MANAGER"],
+          "description": "Retrieve specific service by ID (includes inactive).",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/dental-services/:id",
+          "method": "PUT",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Update specific service details by ID (PUT / PATCH).",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "name": { "type": "string", "required": false, "min": 2, "max": 150 },
+            "description": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "basePrice": { "type": "number", "required": false },
+            "slug": { "type": "string", "required": false, "min": 2, "max": 180 },
+            "isActive": { "type": "boolean", "required": false }
+          }
+        },
+        {
+          "path": "/dental-services/:id/status",
+          "method": "PATCH",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Toggle active state of a service.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "isActive": { "type": "boolean", "required": true }
+          }
+        },
+        {
+          "path": "/dental-services/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Soft delete service by ID.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "appointments": {
+      "description": "Appointments booking and schedule manager.",
+      "routes": [
+        {
+          "path": "/appointments",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get a list of appointments. Patients see their own. Admins/Managers see all. Filterable.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "patientId": { "type": "string", "required": false },
+            "treatedById": { "type": "string (Doctor user id)", "required": false },
+            "createdById": { "type": "string", "required": false },
+            "type": { "type": "AppointmentType", "required": false },
+            "status": { "type": "AppointmentStatus", "required": false },
+            "priority": { "type": "Priority", "required": false },
+            "scheduledAtFrom": { "type": "string (ISO Date)", "required": false },
+            "scheduledAtTo": { "type": "string (ISO Date)", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false },
+            "sortBy": { "type": "string", "required": false, "allowedValues": ["appointmentNo", "scheduledAt", "createdAt", "updatedAt", "status", "priority", "type"] },
+            "sortOrder": { "type": "string", "required": false, "allowedValues": ["asc", "desc"] },
+            "fields": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/appointments",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Book a regular appointment.",
+          "body": {
+            "doctorId": { "type": "string", "required": true },
+            "patientId": { "type": "string", "required": false, "description": "If booked by Admin on behalf of patient" },
+            "scheduledAt": { "type": "string (ISO datetime) | Date", "required": true },
+            "chiefComplaint": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "symptoms": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "services": {
+              "type": "array of objects",
+              "required": false,
+              "description": "Services associated with booking",
+              "items": {
+                "serviceId": { "type": "string", "required": true },
+                "quantity": { "type": "number", "required": false, "default": 1 },
+                "notes": { "type": "string", "required": false, "max": 500, "nullable": true }
+              }
+            }
+          }
+        },
+        {
+          "path": "/appointments/emergency",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Book an emergency appointment.",
+          "body": {
+            "doctorId": { "type": "string", "required": true },
+            "patientId": { "type": "string", "required": false },
+            "scheduledAt": { "type": "string | Date", "required": false },
+            "description": { "type": "string", "required": true, "min": 5, "max": 1500 },
+            "symptoms": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "services": {
+              "type": "array of objects",
+              "required": false,
+              "items": {
+                "serviceId": { "type": "string", "required": true },
+                "quantity": { "type": "number", "required": false, "default": 1 },
+                "notes": { "type": "string", "required": false, "max": 500, "nullable": true }
+              }
+            }
+          }
+        },
+        {
+          "path": "/appointments/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Retrieve specific appointment detailed view.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/appointments/:id",
+          "method": "PUT",
+          "authRequired": true,
+          "description": "Update appointment status, slot, priority, details (PUT / PATCH).",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "doctorId": { "type": "string", "required": false },
+            "scheduledAt": { "type": "string | Date", "required": false },
+            "status": { "type": "AppointmentStatus", "required": false },
+            "priority": { "type": "Priority", "required": false },
+            "chiefComplaint": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "symptoms": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "emergencyNote": { "type": "string", "required": false, "max": 1500, "nullable": true },
+            "cancelReason": { "type": "string", "required": false, "max": 1000, "nullable": true }
+          }
+        },
+        {
+          "path": "/appointments/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "description": "Cancel or soft delete appointment.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "medicalHistories": {
+      "description": "Medical condition files and record attachments.",
+      "routes": [
+        {
+          "path": "/medical-histories",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get medical history entries. Patient gets their own. Admin gets all.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "patientProfileId": { "type": "string", "required": false },
+            "type": { "type": "MedicalHistoryType", "required": false },
+            "dateFrom": { "type": "string", "required": false },
+            "dateTo": { "type": "string", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false },
+            "sortBy": { "type": "string", "required": false, "allowedValues": ["date", "createdAt", "updatedAt", "type", "title"] },
+            "sortOrder": { "type": "string", "required": false, "allowedValues": ["asc", "desc"] },
+            "fields": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/medical-histories",
+          "method": "POST",
+          "authRequired": true,
+          "contentType": "multipart/form-data",
+          "description": "Create a medical history entry. Supports optional file upload using field attachmentFile.",
+          "body": {
+            "title": { "type": "string", "required": false, "max": 150, "nullable": true },
+            "description": { "type": "string", "required": true, "min": 3, "max": 3000 },
+            "date": { "type": "string (ISO date) | Date", "required": true },
+            "type": { "type": "MedicalHistoryType", "required": false, "default": "OTHER" },
+            "allergy": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "condition": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "medication": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "patientProfileId": { "type": "string", "required": false, "description": "Required if created by Admin" },
+            "attachmentFile": { "type": "file", "required": false, "description": "File attachment under 5MB" }
+          }
+        },
+        {
+          "path": "/medical-histories/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Retrieve specific history record details.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/medical-histories/:id",
+          "method": "PUT",
+          "authRequired": true,
+          "contentType": "multipart/form-data",
+          "description": "Update specific history record details (PUT / PATCH). Can upload new file using attachmentFile.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "title": { "type": "string", "required": false, "max": 150, "nullable": true },
+            "description": { "type": "string", "required": false, "min": 3, "max": 3000 },
+            "date": { "type": "string | Date", "required": false },
+            "type": { "type": "MedicalHistoryType", "required": false },
+            "allergy": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "condition": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "medication": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "attachmentFile": { "type": "file", "required": false }
+          }
+        },
+        {
+          "path": "/medical-histories/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "description": "Soft delete medical history record.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "prescriptions": {
+      "description": "Doctor prescriptions containing items, dosages, instructions.",
+      "routes": [
+        {
+          "path": "/prescriptions",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get prescriptions list.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "appointmentId": { "type": "string", "required": false },
+            "createdById": { "type": "string", "required": false },
+            "patientId": { "type": "string", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/prescriptions",
+          "method": "POST",
+          "authRequired": true,
+          "contentType": "multipart/form-data",
+          "description": "Create prescription. Can upload attachmentFile.",
+          "body": {
+            "appointmentId": { "type": "string", "required": true },
+            "notes": { "type": "string", "required": false, "max": 2000, "nullable": true },
+            "pdfUrl": { "type": "string (url)", "required": false, "nullable": true },
+            "attachmentFile": { "type": "file", "required": false },
+            "items": {
+              "type": "array of objects",
+              "required": true,
+              "description": "Medicines prescribed",
+              "items": {
+                "medicineName": { "type": "string", "required": true, "max": 150 },
+                "dosage": { "type": "string", "required": true, "max": 100 },
+                "frequency": { "type": "string", "required": true, "max": 100 },
+                "duration": { "type": "string", "required": true, "max": 100 },
+                "instructions": { "type": "string", "required": false, "max": 500, "nullable": true }
+              }
+            }
+          }
+        },
+        {
+          "path": "/prescriptions/appointment/:appointmentId",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get prescription detail by its associated appointment ID.",
+          "params": {
+            "appointmentId": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/prescriptions/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get prescription detail by prescription ID.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/prescriptions/:id",
+          "method": "PUT",
+          "authRequired": true,
+          "contentType": "multipart/form-data",
+          "description": "Update prescription details (PUT / PATCH). Can upload new file.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "notes": { "type": "string", "required": false, "max": 2000, "nullable": true },
+            "pdfUrl": { "type": "string (url)", "required": false, "nullable": true },
+            "items": { "type": "array of objects", "required": false },
+            "attachmentFile": { "type": "file", "required": false }
+          }
+        },
+        {
+          "path": "/prescriptions/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "description": "Soft delete prescription.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "invoices": {
+      "description": "Billing, invoice items, totals, payments tracking, and EJS PDF generation.",
+      "routes": [
+        {
+          "path": "/invoices",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get list of billing invoices.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "appointmentId": { "type": "string", "required": false },
+            "status": { "type": "InvoiceStatus", "required": false },
+            "patientId": { "type": "string", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/invoices",
+          "method": "POST",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "contentType": "multipart/form-data",
+          "description": "Create new billing invoice. Supports uploading attachmentFile.",
+          "body": {
+            "appointmentId": { "type": "string", "required": true },
+            "dueDate": { "type": "string | Date", "required": false, "nullable": true },
+            "discountAmount": { "type": "number", "required": false, "default": 0 },
+            "taxAmount": { "type": "number", "required": false, "default": 0 },
+            "status": { "type": "InvoiceStatus", "required": false, "default": "DRAFT" },
+            "pdfUrl": { "type": "string (url)", "required": false, "nullable": true },
+            "attachmentFile": { "type": "file", "required": false },
+            "items": {
+              "type": "array of objects",
+              "required": false,
+              "items": {
+                "serviceId": { "type": "string", "required": false, "nullable": true },
+                "serviceName": { "type": "string", "required": true, "max": 150 },
+                "description": { "type": "string", "required": false, "max": 1000, "nullable": true },
+                "quantity": { "type": "number", "required": false, "default": 1 },
+                "unitPrice": { "type": "number", "required": true },
+                "discountAmount": { "type": "number", "required": false, "default": 0 }
+              }
+            }
+          }
+        },
+        {
+          "path": "/invoices/preview/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Pre-renders dynamic EJS invoice template in HTML."
+        },
+        {
+          "path": "/invoices/download/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Compiles the EJS invoice into a PDF using PDFKit and prompts standard file download."
+        },
+        {
+          "path": "/invoices/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get invoice detailed view, including items, totals, patient details, and payments.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/invoices/:id",
+          "method": "PUT",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "contentType": "multipart/form-data",
+          "description": "Update invoice metadata (PUT / PATCH). Can upload new file.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "dueDate": { "type": "string | Date", "required": false },
+            "discountAmount": { "type": "number", "required": false },
+            "taxAmount": { "type": "number", "required": false },
+            "paidAmount": { "type": "number", "required": false },
+            "status": { "type": "InvoiceStatus", "required": false },
+            "pdfUrl": { "type": "string (url)", "required": false },
+            "items": { "type": "array of objects", "required": false },
+            "attachmentFile": { "type": "file", "required": false }
+          }
+        },
+        {
+          "path": "/invoices/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Soft delete invoice.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "notifications": {
+      "description": "User in-app notifications and alerts.",
+      "routes": [
+        {
+          "path": "/notifications",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get all notifications for the authenticated user.",
+          "query": {
+            "isRead": { "type": "boolean | string", "required": false },
+            "type": { "type": "NotificationType", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/notifications/unread-summary",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get quick count of unread notifications."
+        },
+        {
+          "path": "/notifications",
+          "method": "POST",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Create a new notification (Admin only).",
+          "body": {
+            "recipientId": { "type": "string", "required": true },
+            "title": { "type": "string", "required": true, "min": 2, "max": 150 },
+            "message": { "type": "string", "required": true, "min": 2, "max": 1000 },
+            "type": { "type": "NotificationType", "required": false, "default": "SYSTEM" },
+            "entityType": { "type": "EntityType", "required": false },
+            "entityId": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/notifications/mark-as-read",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Mark list of notification IDs as read.",
+          "body": {
+            "ids": { "type": "array of strings", "required": true }
+          }
+        },
+        {
+          "path": "/notifications/mark-all-read",
+          "method": "PATCH",
+          "authRequired": true,
+          "description": "Mark all notifications for the authenticated user as read."
+        },
+        {
+          "path": "/notifications/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get specific notification detail.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/notifications/:id/read",
+          "method": "PATCH",
+          "authRequired": true,
+          "description": "Mark a single notification as read.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/notifications/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "description": "Remove/delete notification.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        }
+      ]
+    },
+    "chat": {
+      "description": "Instant messaging, support channels, and AI Dental assistant.",
+      "routes": [
+        {
+          "path": "/chat/conversations",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get user conversations list.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "patientId": { "type": "string", "required": false },
+            "type": { "type": "ConversationType", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/chat/conversations",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Create a new conversation channel.",
+          "body": {
+            "title": { "type": "string", "required": false, "max": 150, "nullable": true },
+            "type": { "type": "ConversationType", "required": false, "default": "PATIENT_SUPPORT" },
+            "patientId": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/chat/conversations/:id",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Get specific conversation details.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/chat/conversations/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "description": "Delete a conversation channel.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/chat/conversations/:id/messages",
+          "method": "GET",
+          "authRequired": true,
+          "description": "Retrieve messages within a specific conversation channel. Filterable & paginated.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "senderId": { "type": "string", "required": false },
+            "recipientId": { "type": "string", "required": false },
+            "senderType": { "type": "ChatSenderType", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/chat/conversations/:id/messages",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Send a text message inside a conversation channel.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          },
+          "body": {
+            "content": { "type": "string", "required": true, "min": 1, "max": 3000 },
+            "recipientId": { "type": "string", "required": false }
+          }
+        },
+        {
+          "path": "/chat/messages/:id/read",
+          "method": "PATCH",
+          "authRequired": true,
+          "description": "Mark a message as read.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/chat/messages/:id",
+          "method": "DELETE",
+          "authRequired": true,
+          "description": "Delete specific message.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/chat/ai",
+          "method": "POST",
+          "authRequired": true,
+          "description": "Chat with the AI Dental Care Assistant. Responds instantly based on dental knowledge base.",
+          "body": {
+            "message": { "type": "string", "required": true, "min": 1, "max": 3000 },
+            "conversationId": { "type": "string", "required": false }
+          }
+        }
+      ]
+    },
+    "admin": {
+      "description": "Clinical analytics, overall system performance dashboard, and administrative actions.",
+      "routes": [
+        {
+          "path": "/admin/dashboard",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Retrieve admin dashboard metadata (total count statistics, active bookings, weekly earnings, upcoming sessions, billing aggregates)."
+        },
+        {
+          "path": "/admin/users",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Retrieve overall system user list. Filterable, paginated.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "role": { "type": "Role", "required": false },
+            "status": { "type": "Status", "required": false },
+            "isActive": { "type": "boolean | string", "required": false },
+            "emailVerified": { "type": "boolean | string", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/admin/appointments",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Retrieve overall system appointments list. Filterable, paginated.",
+          "query": {
+            "searchTerm": { "type": "string", "required": false },
+            "patientId": { "type": "string", "required": false },
+            "treatedById": { "type": "string", "required": false },
+            "status": { "type": "AppointmentStatus", "required": false },
+            "priority": { "type": "Priority", "required": false },
+            "page": { "type": "number | string", "required": false },
+            "limit": { "type": "number | string", "required": false }
+          }
+        },
+        {
+          "path": "/admin/appointments/:id",
+          "method": "GET",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Retrieve specific appointment detail by ID.",
+          "params": {
+            "id": { "type": "string", "required": true }
+          }
+        },
+        {
+          "path": "/admin/appointments",
+          "method": "POST",
+          "authRequired": true,
+          "allowedRoles": ["ADMIN"],
+          "description": "Create/Book a new appointment directly on behalf of a patient (Admin booking tool).",
+          "body": {
+            "patientId": { "type": "string", "required": true },
+            "doctorId": { "type": "string", "required": true },
+            "scheduledAt": { "type": "string (ISO datetime) | Date", "required": true },
+            "type": { "type": "AppointmentType", "required": false, "default": "REGULAR" },
+            "priority": { "type": "Priority", "required": false },
+            "chiefComplaint": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "symptoms": { "type": "string", "required": false, "max": 1000, "nullable": true },
+            "emergencyNote": { "type": "string", "required": false, "max": 1500, "nullable": true },
+            "services": {
+              "type": "array of objects",
+              "required": false,
+              "items": {
+                "serviceId": { "type": "string", "required": true },
+                "quantity": { "type": "number", "required": false, "default": 1 },
+                "notes": { "type": "string", "required": false, "max": 500, "nullable": true }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
